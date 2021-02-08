@@ -61,7 +61,7 @@ del osUsing
 # clear screen function 
 def customClearScreen():
     if(GlobalData_main.isOnWindows == True):
-        os.system("cls")
+        os.system("self")
     else:
         sp.call('clear',shell=True)
 
@@ -100,6 +100,38 @@ if __name__ == "__main__":
     # loading animation thread started 
     GlobalData_main.lAnimationObj = LoadingAnimation()
     GlobalData_main.lAnimationObj.start()
+
+
+
+
+
+
+
+
+# importing additional modules
+from easyOpenWeather import module as owm
+
+
+
+
+
+
+class WeatherFunctionality:
+    
+    def __init__(self):
+        self.moduleObj = owm.WeatherDataClass()
+        self.moduleObj.setApiKey("")
+    
+    def returnDataDict(self , cityName):
+        self.moduleObj.setCityName(cityName)
+    
+        listPass = ["tempInC" , "tempMin" , "tempMax" , "pressure" , "humidity" , "windSpeed" , "windDirection" , "clouds" , "description"]
+
+        self.moduleObj.setList(listPass)
+        return self.moduleObj.getInfo()
+
+
+
 
 
 
