@@ -1,8 +1,19 @@
+# essential modules
+import os
+import platform
+import time
+import sys
+import subprocess as sp
+from threading import Thread
+sys.path.append(os.path.join(os.path.dirname(__file__), '.'))
+
+from packages.logger import loggerpy 
+
+
+
+
 # declaring some global variables
 class GlobalData_main:
-    
-    # if the troubleshoot is enabled or not
-    troubleshoot = False
 
     # variables to determine the operating system of the user 
     isOnWindows = False
@@ -14,24 +25,14 @@ class GlobalData_main:
     lAnimationObj = None
 
 
+    # path for storing the program files
+    folderPathWindows = r"C:\programData\JarvisData"
+    folderPathLinux = os.getcwd() + "/JarvisData"
+    folderPathWindows_simpleSlash = r"C:/programData/JarvisData"
 
-
-
-
-
-
-
-# essential modules
-import os
-import platform
-import time
-import sys
-import subprocess as sp
-from threading import Thread
-
-
-
-
+    # obj for logger module
+    objClogger = None
+    troubleshootValue = True
 
 
 
@@ -43,8 +44,22 @@ osUsing = platform.system()
 
 if(osUsing == "Linux"):
     GlobalData_main.isOnLinux = True
+
+    # making the program data folder
+    try:
+        os.mkdir(GlobalData_main.folderPathLinux)
+    except FileExistsError:
+        pass
+
 elif(osUsing == "Windows"):
     GlobalData_main.isOnWindows = True
+
+    # making the program data folder
+    try:
+        os.mkdir(GlobalData_main.folderPathWindows)
+    except FileExistsError:
+        pass
+
 else:
     print("Jarvis currently does not support this operating system :(")
     time.sleep(3)
@@ -67,6 +82,9 @@ def customClearScreen():
 
 
 
+# setting up the logger module
+GlobalData_main.objClogger = loggerpy.Clogger(GlobalData_main.isOnWindows , GlobalData_main.isOnLinux , GlobalData_main.folderPathWindows_simpleSlash , GlobalData_main.folderPathLinux)
+GlobalData_main.objClogger.setTroubleShoot(GlobalData_main.troubleshootValue)
 
 
 
@@ -131,11 +149,21 @@ class GlobalMethods:
             for i, j in enumerate(string):
                 if(j == subString[0]):
                     if(subString == string[i:i+lengthOfSubString]):
+                        
+                        # logging the result for debugging purpose
+                        GlobalData_main.objClogger.log("subString found in GlobalMethod class isSubString function , values(string , subString) = ({} , {})".format(string , subString) , "i")
                         return True
                     else:
                         pass
+
+            # logging the result for debugging purpose
+            GlobalData_main.objClogger.log("subString not found in GlobalMethod class isSubString function , values(string , subString) = ({} , {})".format(string , subString) , "i")
             return False
+
         except Exception as e:
+
+            # logging the error
+            GlobalData_main.objClogger.exception(str(e) , "Error in GlobalMethod class isSubString function , values(string , subString) = ({} , {})".format(string , subString))
             return False
 
 
@@ -218,8 +246,21 @@ class WeatherFunctionality:
         if(len(self.__apiKey) == 0):
             return None
 
-        # returning the info in dict form
-        return self.moduleObj.getInfo()
+        try:
+            # returning the info in dict form
+            finalResult = self.moduleObj.getInfo()
+            
+            # logging the result for debugging purpose
+            GlobalData_main.objClogger.log("weather details retrieved successfully in weather functionality class returnDataDict function , values(cityName) = ({})".format(cityName) , "i")
+
+            return finalResult
+
+        except Exception as e:
+
+            # logging the error
+            GlobalData_main.objClogger.exception(str(e) , "Exception in getting the weather details in WeatherFunctionality class and returnDataDict function , values(cityName) = ({})".format(cityName))
+            
+            return "error"
 
 
 
@@ -234,14 +275,11 @@ def driver(command):
     if(GlobalMethods.isSubStringsList(command , "weather")):
 
         # getting the city name from command(weather cityName)
-        cityName = ""
+        cityName = command[len("weather") + 1:]
 
-        # as the city name is at index 1
-        commandList = command.split()
+        cityName = cityName.strip()
 
-        try:
-            cityName = commandList[1]
-        except IndexError:
+        if(len(cityName) <= 1):
             return ["please pass the city name like weather london"]
 
         # getting the result from the class
@@ -252,6 +290,9 @@ def driver(command):
         # if the api key is not set then return the message
         if(result == None):
             return ["please set the api key"]
+        
+        if(result == "error"):
+            return ["please pass a correct city name"]
 
         # else conv the dict returned into list with [[key] , [value]]
         resultList = []
@@ -274,6 +315,9 @@ def driver(command):
     if(GlobalMethods.isSubStringsList(command , "exit")):
         sys.exit()
 
+
+    else:
+        return ["Command not found , Try again , or Type Help for Help"]
 
 
 
@@ -312,6 +356,13 @@ if __name__ == "__main__":
     # closing the loading animation
     GlobalData_main.runLoadingAnimation = False
     GlobalData_main.lAnimationObj.join()
+
+    # A message will be printed if the troubleshoot value is True by default
+    if(GlobalData_main.troubleshootValue):
+        print("\nIn dev Mode \n")
+        time.sleep(0.5)
+
+    customClearScreen()
 
     # main will be called
     main()
