@@ -115,6 +115,80 @@ from easyOpenWeather import module as owm
 
 
 
+# class containing some of the global methods
+class GlobalMethods:
+
+    # method for comparing if a string as a certain substring
+    @classmethod
+    def isSubString(cls , string , subString):
+        lengthOfSubString = len(subString)
+        try:
+            """ for substring to be string - 
+                1. check if the first of substring matches the string as certain i position
+                2. for that i , check wheather the next characters also matches the substring till i + length of substring"""
+
+            for i, j in enumerate(string):
+                if(j == subString[0]):
+                    if(subString == string[i:i+lengthOfSubString]):
+                        return True
+                    else:
+                        pass
+            return False
+        except Exception as e:
+            return False
+
+
+
+    # method for checking if the substring is in string using list
+    @classmethod
+    def isSubStringsList(cls , string , subString):
+
+        """ This method check is this way :
+            normal substring check - string(hello world , this is jarvis) , subString(this jarvis) -> False
+            using list substring check - string(hello world , this is jarvis) , subString(this jarvis) -> True
+            compares the invidual words as substring"""
+
+        # converting them to same case
+        string = string.upper()
+        subString = subString.upper()
+
+        # getting the list of words in substring sperated by space
+        subStringList = subString.split()
+
+        # vars to keep track of number of successfull comparisions
+        count1 = 0
+        count2 = 0
+
+        for i in subStringList:
+            # striping the leading and trailing spaces of word in sub string list
+            i = i.strip()
+
+            # increasing the count1 as we have traversed a word
+            count1 += 1
+
+            # if this word is also a substring then we increase the count2 as well
+            if(cls.isSubString(string , i)):
+                count2 += 1
+            else:
+                # returned false as now substring is not in string
+                return False
+
+        # if the count1 matches the count2 and count1 should be greater than 0 then substring is in string
+        if((count1 == count2) and count1 > 0):
+            return True
+        else:
+            return False
+
+
+
+
+
+
+
+
+
+
+
 
 class WeatherFunctionality:
     
@@ -133,6 +207,30 @@ class WeatherFunctionality:
 
 
 
+def driver(command):
+    
+
+    if(GlobalMethods.isSubStringsList(command , "weather")):
+        print("hello")
+
+
+
+
+def main():
+
+    while(True):
+        customClearScreen()
+
+        print("Welcome sir , What can i do for you :)\n")
+
+        command = input("Enter Command : ")
+
+        driver(command)
+
+        input()
+
+        
+
 
 
 
@@ -143,5 +241,4 @@ if __name__ == "__main__":
     GlobalData_main.runLoadingAnimation = False
     GlobalData_main.lAnimationObj.join()
 
-    print("end")
-
+    main()
