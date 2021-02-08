@@ -110,6 +110,7 @@ if __name__ == "__main__":
 
 # importing additional modules
 from easyOpenWeather import module as owm
+from tabulate import tabulate
 
 
 
@@ -189,45 +190,116 @@ class GlobalMethods:
 
 
 
-
+# class to get the wheather details
 class WeatherFunctionality:
     
     def __init__(self):
+        
+        # making the object
         self.moduleObj = owm.WeatherDataClass()
-        self.moduleObj.setApiKey("")
+
+        # set the api key here
+        # it is removed before commiting for security reasons
+        self.__apiKey = ""
+        self.moduleObj.setApiKey(self.__apiKey)
     
+
+    # driver function
     def returnDataDict(self , cityName):
+
+        # setting the city name as per https://github.com/harshnative/easyOpenWeather_module
         self.moduleObj.setCityName(cityName)
     
+        # these the things for which the data will be retreived
         listPass = ["tempInC" , "tempMin" , "tempMax" , "pressure" , "humidity" , "windSpeed" , "windDirection" , "clouds" , "description"]
-
         self.moduleObj.setList(listPass)
+
+        # if the api key is not setted return None , so that driver function can stop running
+        if(len(self.__apiKey) == 0):
+            return None
+
+        # returning the info in dict form
         return self.moduleObj.getInfo()
 
 
 
 
+# main driver function for executing commands
 def driver(command):
+
+    """No print is used before main to keep the functions modular , just return the result to main in list form or yield form"""
     
 
+    # if the weather command is passed
     if(GlobalMethods.isSubStringsList(command , "weather")):
-        print("hello")
+
+        # getting the city name from command(weather cityName)
+        cityName = ""
+
+        # as the city name is at index 1
+        commandList = command.split()
+
+        try:
+            cityName = commandList[1]
+        except IndexError:
+            return ["please pass the city name like weather london"]
+
+        # getting the result from the class
+        weatherObj = WeatherFunctionality()
+
+        result = weatherObj.returnDataDict(cityName)
+
+        # if the api key is not set then return the message
+        if(result == None):
+            return ["please set the api key"]
+
+        # else conv the dict returned into list with [[key] , [value]]
+        resultList = []
+
+        for i , j in result.items():
+            tempList = []
+            tempList.append(i)
+            tempList.append(j)
+            resultList.append(tempList)
+
+        # using the tabulate module to pretify the output
+        toReturn = tabulate(resultList , headers=['Query', 'Data'])
+
+        # returning the result so it can be printed
+        return [toReturn]
+
+
+    
+    # if exit command is passed
+    if(GlobalMethods.isSubStringsList(command , "exit")):
+        sys.exit()
 
 
 
 
+
+# main function for inputting commands
 def main():
 
+    # running until exit is called in driver
     while(True):
         customClearScreen()
 
+        # greeting the user
         print("Welcome sir , What can i do for you :)\n")
 
+        # inputting the command
         command = input("Enter Command : ")
 
-        driver(command)
+        customClearScreen()
 
+        # priting the result from driver function
+        for i in driver(command):
+            print(i)
+
+        print("\n\nPress Enter to continue ...")
         input()
+
 
         
 
@@ -241,4 +313,5 @@ if __name__ == "__main__":
     GlobalData_main.runLoadingAnimation = False
     GlobalData_main.lAnimationObj.join()
 
+    # main will be called
     main()
