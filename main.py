@@ -8,6 +8,7 @@ from threading import Thread
 sys.path.append(os.path.join(os.path.dirname(__file__), '.'))
 
 from packages.logger import loggerpy 
+from packages.speedTest import speedTestFile
 
 
 
@@ -260,7 +261,7 @@ class WeatherFunctionality:
             # logging the error
             GlobalData_main.objClogger.exception(str(e) , "Exception in getting the weather details in WeatherFunctionality class and returnDataDict function , values(cityName) = ({})".format(cityName))
             
-            return "error"
+            return "error , could not get the weather details :("
 
 
 
@@ -280,7 +281,8 @@ def driver(command):
         cityName = cityName.strip()
 
         if(len(cityName) <= 1):
-            return ["please pass the city name like weather london"]
+            yield "please pass the city name like weather london"
+            return
 
         # getting the result from the class
         weatherObj = WeatherFunctionality()
@@ -289,10 +291,12 @@ def driver(command):
 
         # if the api key is not set then return the message
         if(result == None):
-            return ["please set the api key"]
+            yield "please set the api key"
+            return
         
         if(result == "error"):
-            return ["please pass a correct city name"]
+            yield "please pass a correct city name"
+            return
 
         # else conv the dict returned into list with [[key] , [value]]
         resultList = []
@@ -307,7 +311,17 @@ def driver(command):
         toReturn = tabulate(resultList , headers=['Query', 'Data'])
 
         # returning the result so it can be printed
-        return [toReturn]
+        yield toReturn
+
+
+    # if the speed test  command is passed
+    if(GlobalMethods.isSubStringsList(command , "speed test")):
+        sObj = speedTestFile.SpeedTestClass(GlobalData_main.objClogger)
+
+        for i in sObj.runSpeedTestUtility():
+            yield i
+        
+        return
 
 
     
@@ -317,7 +331,7 @@ def driver(command):
 
 
     else:
-        return ["Command not found , Try again , or Type Help for Help"]
+        yield "Command not found , Try again , or Type Help for Help"
 
 
 
@@ -339,7 +353,10 @@ def main():
 
         # priting the result from driver function
         for i in driver(command):
-            print(i)
+            if(i == "clear screen"):
+                customClearScreen()
+            else:
+                print(i)
 
         print("\n\nPress Enter to continue ...")
         input()
