@@ -130,6 +130,7 @@ from easyOpenWeather import module as owm
 from tabulate import tabulate
 
 from packages.speedTest import speedTestFile
+from packages.settingM import settingsFile
 
 
 
@@ -266,6 +267,20 @@ class WeatherFunctionality:
 
 
 
+# class for settings functionality
+class Settings:
+
+    # setting up the object 
+    settingObj = settingsFile.SettingsClass(GlobalData_main.folderPathWindows_simpleSlash , GlobalData_main.folderPathLinux , GlobalData_main.isOnWindows , GlobalData_main.isOnLinux)
+
+    # method to return the dict
+    @classmethod
+    def returnDict(cls):
+        returnedDict = cls.settingObj.getDict()
+        return returnedDict
+
+
+
 # main driver function for executing commands
 def driver(command):
 
@@ -323,7 +338,10 @@ def driver(command):
         
         return
 
-
+    # if the setting command is passed
+    if(GlobalMethods.isSubStringsList(command , "setting")):
+        yield "none"
+        return
     
     # if exit command is passed
     if(GlobalMethods.isSubStringsList(command , "exit")):
@@ -343,8 +361,18 @@ def main():
     while(True):
         customClearScreen()
 
+        userName = "sir"
+
+        try:
+            # getting the username from the settings file
+            returnedDict = Settings.returnDict()
+            userName = returnedDict.get("username" , "sir")
+        except Exception as e:
+            GlobalData_main.objClogger.exception(str(e) , "Exception in getting the dict from the settings file , may be the cpu was busy")
+
+
         # greeting the user
-        print("Welcome sir , What can i do for you :)\n")
+        print("Welcome {} , What can i do for you :)\n".format(userName))
 
         # inputting the command
         command = input("Enter Command : ")
