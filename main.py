@@ -6,9 +6,7 @@ import sys
 import subprocess as sp
 from threading import Thread
 sys.path.append(os.path.join(os.path.dirname(__file__), '.'))
-
 from packages.logger import loggerpy 
-from packages.speedTest import speedTestFile
 
 
 
@@ -130,6 +128,8 @@ if __name__ == "__main__":
 # importing additional modules
 from easyOpenWeather import module as owm
 from tabulate import tabulate
+
+from packages.speedTest import speedTestFile
 
 
 
