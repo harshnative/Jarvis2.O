@@ -283,6 +283,19 @@ class Settings:
         returnedDict = cls.settingObj.getDict()
         return returnedDict
 
+    # method to open the settings file
+    # returns True on successfull opening 
+    # else returns false and logs error
+    @classmethod
+    def openSettingsFile(cls):
+        result = cls.settingObj.openSettings()
+
+        if(result == None):
+            return True
+        else:
+            GlobalData_main.objClogger.exception(str(result) , "Exception in opening the settings file")
+            return False
+
 
 
 # main driver function for executing commands
@@ -354,8 +367,13 @@ def driver(command):
 
     # if the setting command is passed
     if(GlobalMethods.isSubStringsList(command , "setting")):
-        yield "none"
-        return
+        if(Settings.openSettingsFile()):
+            yield "Settings file opened"
+            yield "\nDon't forget to save it and run the update command after wards"
+            return
+        else:
+            yield "Error opening the settings file , Try running the troubleshoot command"
+            return
 
     
     # if exit command is passed

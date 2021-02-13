@@ -1,5 +1,7 @@
 from .txtJson import TxtJson
 import time
+import subprocess
+import os
 
 # main class
 class SettingsClass:
@@ -68,3 +70,17 @@ pathForPassDB : None
             file.write(settingsFile)
 
         
+    # function to open the settings using default opener
+    # None is retruned on succesfull opening 
+    # exception in string format is returned else wise
+    def openSettings(self):
+        try:
+            # startfile utility on windows
+            if(self.isOnWindows):
+                os.startfile(self.path)
+            else:
+                # using gedit on linux
+                os.system("gedit " + self.path)
+            return None
+        except Exception as e:
+            return str(e)
