@@ -360,7 +360,25 @@ def driver(command):
     if(GlobalMethods.isSubStringsList(command , "speed test")):
         sObj = speedTestFile.SpeedTestClass(GlobalData_main.objClogger)
 
-        for i in sObj.runSpeedTestUtility():
+        # spliting the command to get command list
+        commandList = command.split()
+
+        inBytes = False
+        numberOfTimes = 2
+
+        # if user wants result in bytes instead of bits
+        if(("-b" in commandList) or ("-B" in commandList)):
+            inBytes = True
+
+        # finding the user as passed number of times
+        for i in commandList:
+            if(i.isnumeric()):
+                if(int(i) <= 5):
+                    numberOfTimes = int(i)
+        
+
+
+        for i in sObj.runSpeedTestUtility(inBytes=inBytes , numberOfTimesToDo=numberOfTimes):
             yield i
         
         return
