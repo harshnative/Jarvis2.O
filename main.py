@@ -375,6 +375,13 @@ def driver(command):
             yield "Error opening the settings file , Try running the troubleshoot command"
             return
 
+
+    # if update command is passed
+    if(GlobalMethods.isSubStringsList(command , "update")):
+        GlobalData_main.settingDict = Settings.returnDict()
+        yield "new settings applied ..."
+        return
+
     
     # if exit command is passed
     if(GlobalMethods.isSubStringsList(command , "exit")):
