@@ -33,6 +33,10 @@ class GlobalData_main:
     objClogger = None
     troubleshootValue = True
 
+    # dict from the settings file will be stored here
+    settingDict = None 
+
+
 
 
 
@@ -290,14 +294,24 @@ def driver(command):
     # if the weather command is passed
     if(GlobalMethods.isSubStringsList(command , "weather")):
 
+        # getting the default city name
+        cityNameFromSet = GlobalData_main.settingDict.get("cityName" , "None")
+
         # getting the city name from command(weather cityName)
         cityName = command[len("weather") + 1:]
 
         cityName = cityName.strip()
-
-        if(len(cityName) <= 1):
-            yield "please pass the city name like weather london"
+        
+        # if the city name is None is settings file and also city name is not passed in command then error will be returned to user
+        if((cityNameFromSet == "None") and (len(cityName) <= 1)):
+            yield "please pass the city name like weather london or set the default city name in settings file"
+            yield "\nYou can open settings file by typing settings command"
             return
+
+        # else if city is not passed then it will be taken from the settings file
+        elif((len(cityName) <= 1)):
+            cityName = cityNameFromSet
+            
 
         # getting the result from the class
         weatherObj = WeatherFunctionality()
@@ -342,6 +356,7 @@ def driver(command):
     if(GlobalMethods.isSubStringsList(command , "setting")):
         yield "none"
         return
+
     
     # if exit command is passed
     if(GlobalMethods.isSubStringsList(command , "exit")):
@@ -361,15 +376,7 @@ def main():
     while(True):
         customClearScreen()
 
-        userName = "sir"
-
-        try:
-            # getting the username from the settings file
-            returnedDict = Settings.returnDict()
-            userName = returnedDict.get("username" , "sir")
-        except Exception as e:
-            GlobalData_main.objClogger.exception(str(e) , "Exception in getting the dict from the settings file , may be the cpu was busy")
-
+        userName = GlobalData_main.settingDict.get("username" , "sir")
 
         # greeting the user
         print("Welcome {} , What can i do for you :)\n".format(userName))
@@ -408,6 +415,29 @@ if __name__ == "__main__":
         time.sleep(0.5)
 
     customClearScreen()
+
+    # cache the settings dict in main memory
+    try:
+        GlobalData_main.settingDict = Settings.returnDict()
+    
+    # if the cache fails then the settings file retored may not have been written due to not availabilty of cpu
+    except Exception as e:
+        GlobalData_main.objClogger.exception(str(e) , "Exception in getting the dict from the settings file , may be the cpu was busy , trying again in 1 sec")
+        time.sleep(1)
+
+        # after one second jarvis will try again
+        try:
+            GlobalData_main.settingDict = Settings.returnDict()
+
+            # if jarvis fails this time also then the computer must have been in deadlock state or jarvis does not have read write permission to program's data folder
+        except Exception as e:
+            GlobalData_main.objClogger.exception(str(e) , "Exception in getting the dict from the settings file , may be the cpu was busy , or jarvis does not have read write permission")
+            customClearScreen()
+            print("Could not load the settings file , cpu does not responded or jarvis does not have read write permission , Try again in some time :(")
+            print("\n\nPress enter to continue")
+            input()
+            sys.exit()
+
 
     # main will be called
     main()

@@ -54,6 +54,11 @@ class SettingsClass:
 # username - comes instead of sir in greeting line - welcome { username }
 username : sir
 
+
+# deafult city name for weather data
+cityName : None
+
+
 # path for password database
 pathForPassDB : None 
         """
