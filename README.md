@@ -108,4 +108,5 @@ To apply the newly updates settings in Jarvis
 
 
 </br>
-Default settings file looks like - 
+Default settings file looks like - https://github.com/harshnative/Jarvis2.O/blob/main/defaultSettings.txt
+
