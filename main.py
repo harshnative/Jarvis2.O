@@ -235,7 +235,10 @@ class WeatherFunctionality:
         # set the api key here
         # it is removed before commiting for security reasons
         self.__apiKey = ""
-        self.moduleObj.setApiKey(self.__apiKey)
+
+        # if the custom api key is not setted then the default api key present with the module will be used
+        if(self.__apiKey != ""):
+            self.moduleObj.setApiKey(self.__apiKey)
     
 
     # driver function
@@ -248,9 +251,6 @@ class WeatherFunctionality:
         listPass = ["tempInC" , "tempMin" , "tempMax" , "pressure" , "humidity" , "windSpeed" , "windDirection" , "clouds" , "description"]
         self.moduleObj.setList(listPass)
 
-        # if the api key is not setted return None , so that driver function can stop running
-        if(len(self.__apiKey) == 0):
-            return None
 
         try:
             # returning the info in dict form
