@@ -95,17 +95,24 @@ You can combine the commands
 
 # settings
 ```
-setting
+open setting
 ```
 To open the settings file
 
 </br>
 
 ```
-update
+update setting
 ```
 To apply the newly updates settings in Jarvis 
 
+
+</br>
+
+```
+restore setting
+```
+To restore the settings file to default value 
 
 </br>
 Default settings file looks like - https://github.com/harshnative/Jarvis2.O/blob/main/defaultSettings.txt

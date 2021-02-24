@@ -42,6 +42,30 @@ class GlobalData_main:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Checking the users operating system and adding data to global class
 osUsing = platform.system()
 
@@ -76,12 +100,73 @@ del osUsing
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # clear screen function 
 def customClearScreen():
     if(GlobalData_main.isOnWindows == True):
-        os.system("self")
+        os.system("cls")
     else:
         sp.call('clear',shell=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -129,12 +214,59 @@ if __name__ == "__main__":
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # importing additional modules
 from easyOpenWeather import module as owm
 from tabulate import tabulate
 
 from packages.speedTest import speedTestFile
 from packages.settingM import settingsFile
+from packages.passwordStorer import mainCode
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -224,6 +356,33 @@ class GlobalMethods:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # class to get the wheather details
 class WeatherFunctionality:
     
@@ -271,6 +430,35 @@ class WeatherFunctionality:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # class for settings functionality
 class Settings:
 
@@ -295,6 +483,60 @@ class Settings:
         else:
             GlobalData_main.objClogger.exception(str(result) , "Exception in opening the settings file")
             return False
+
+    
+    # method to restore the settings file with default settings
+    @classmethod
+    def restoreSettings(cls):
+        cls.settingObj.regenerateSettingsFile()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Help:
+    pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -356,6 +598,23 @@ def driver(command):
         yield toReturn
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # if the speed test  command is passed
     if(GlobalMethods.isSubStringsList(command , "speed test")):
         sObj = speedTestFile.SpeedTestClass(GlobalData_main.objClogger)
@@ -383,24 +642,136 @@ def driver(command):
         
         return
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # if the setting command is passed
     if(GlobalMethods.isSubStringsList(command , "setting")):
-        if(Settings.openSettingsFile()):
-            yield "Settings file opened"
-            yield "\nDon't forget to save it and run the update command after wards"
+
+        # if update setting command is passed
+        if(GlobalMethods.isSubStringsList(command , "update")):
+            GlobalData_main.settingDict = Settings.returnDict()
+            yield "new settings applied ..."
             return
+        
+        # if update setting command is passed
+        if(GlobalMethods.isSubStringsList(command , "restore")):
+            Settings.restoreSettings()
+            yield "settings restored to default values ..."
+            return
+
+        # if update setting command is passed
+        if(GlobalMethods.isSubStringsList(command , "open")):
+            if(Settings.openSettingsFile()):
+                yield "Settings file opened"
+                yield "\nDon't forget to save it and run the update command after wards"
+                return
+            else:
+                yield "Error opening the settings file , Try running the troubleshoot command"
+                return
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # if the password command is passed
+    if(GlobalMethods.isSubStringsList(command , "password")):
+
+        # getting the path from settings dict
+        customPath = GlobalData_main.settingDict.get("pathForPassDB")
+
+
+        # if path is not setted then simply create new db
+        if(customPath.lower() == "none"):
+            customPath = None
         else:
-            yield "Error opening the settings file , Try running the troubleshoot command"
-            return
+
+            # if the path is setted but is incorrect or jarvis does not have permission to read write at that file dir then simply promt a message
+            if(not(os.path.isfile(customPath))):
+                print("Path specified in settings file for \"pathForPassDB\" is either incorrect or jarvis does not permission to read write their.\npassword module will create a new data base now")
+
+                inputted = input("\n\nEnter 1 to continue or anything else to quit")
+                
+                if(inputted != 1):
+                    yield "clear screen"
+                    yield "cannot open password db"
+                    return True
+                    
+
+        # waking the driver function of password module
+        obj = mainCode.PasswordStorerClass(GlobalData_main.isOnWindows , GlobalData_main.isOnLinux , GlobalData_main.folderPathWindows_simpleSlash , GlobalData_main.folderPathLinux , customPath)
+        obj.driverFunc()
+
+        yield "clear screen"
+        yield "exitted password db"
+        return True
+        
 
 
-    # if update command is passed
-    if(GlobalMethods.isSubStringsList(command , "update")):
-        GlobalData_main.settingDict = Settings.returnDict()
-        yield "new settings applied ..."
-        return
 
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # if exit command is passed
     if(GlobalMethods.isSubStringsList(command , "exit")):
         sys.exit()
@@ -408,6 +779,27 @@ def driver(command):
 
     else:
         yield "Command not found , Try again , or Type Help for Help"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
