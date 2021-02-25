@@ -34,7 +34,20 @@ class GlobalData_main:
     troubleshootValue = True
 
     # dict from the settings file will be stored here
-    settingDict = None 
+    settingDict = None
+
+
+    # variable for file share module
+    portForFileShare = 5000 
+    isFileShareStarted = False
+    addressForShare = None
+    dataListFileShare = []
+
+    # obj to store tk object
+    root = None
+
+    # list holding info about running background operations
+    printDataList = []
 
 
 
@@ -242,6 +255,16 @@ from packages.speedTest import speedTestFile
 from packages.settingM import settingsFile
 from packages.passwordStorer import mainCode
 
+
+
+# importting components for file share functionality
+from packages.fileShare import FS
+from tkinter import filedialog
+from tkinter import *
+
+if __name__ == "__main__":
+    GlobalData_main.root = Tk()
+    GlobalData_main.root.withdraw()
 
 
 
@@ -537,6 +560,93 @@ class Help:
 
 
 
+# class to implement the file share functionality
+class FileShareClass:
+
+
+    # some class vars
+    fil = FS.FileShareClass()
+    path = None 
+
+    
+    # function to set the share path for the file share
+    # open the tk gui window and then stores the returned path in class var
+    # return False if process fails else return True
+    @classmethod
+    def setSharePath(cls):
+        try:
+            folder_selected = filedialog.askdirectory()
+        except Exception as e:
+            GlobalData_main.objClogger.exception(str(e) , "Exception in getting folder path from tkinter window")
+            return False
+
+        cls.path = folder_selected
+        return True
+
+
+
+
+    # function to start the file share 
+    # returns None in case of process failure
+    # else returns a list of output from module
+    @classmethod
+    def startFileShare(cls , http = False):
+        cls.fil.setPort(GlobalData_main.portForFileShare)
+        try:
+            result = cls.fil.start_fileShare(cls.path , http=http)
+            GlobalData_main.dataListFileShare = result
+            GlobalData_main.addressForShare = cls.fil.get_ip_address()
+            GlobalData_main.printDataList.append("File Share active at {}:{}".format(str(GlobalData_main.addressForShare) , str(GlobalData_main.portForFileShare)))
+            GlobalData_main.objClogger.log("file share server started at {}".format(str(cls.path)) , "i")
+            GlobalData_main.isFileShareStarted = True
+            return result
+        except Exception as e:
+            GlobalData_main.objClogger.exception(str(e) , "Exception in starting the file share server at {}".format(str(cls.path)))
+            return None
+
+    
+    # function to stop the file share module
+    # return True if process completes
+    # else returns False
+    @classmethod
+    def stopFileShare(cls):
+        try:
+            cls.fil.stopFileShare()
+            cls.fil = FS.FileShareClass()
+            GlobalData_main.printDataList.clear()
+            GlobalData_main.printDataList.remove("File Share active at {}:{}".format(str(GlobalData_main.addressForShare) , str(GlobalData_main.portForFileShare)))
+            GlobalData_main.isFileShareStarted = False
+            GlobalData_main.objClogger.log("file share server stopped at {}".format(str(cls.path)) , "i")
+            return True
+        except Exception as e:
+            GlobalData_main.objClogger.exception(str(e) , "Exception in starting the file share server at {}".format(str(cls.path)))
+            return False
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -740,6 +850,107 @@ def driver(command):
         yield "clear screen"
         yield "exitted password db"
         return True
+    
+
+
+
+
+
+
+
+
+
+
+
+
+    # if set port command is passed
+    if(GlobalMethods.isSubStringsList(command , "set file port")):
+
+        # splitting the command string to get a list
+        commandList = command.split()
+
+        port = 5000
+
+        # traversing the command list until a numeric value is found as i
+        # then set that numeric value as port
+        for i in commandList:
+            i = str(i)
+            if(i.isnumeric()):
+                port = i
+            
+        port = int(port)
+
+        # port must be btw 1000 and 9999
+        if((port < 1000) or (port > 9999)):
+            yield "port number must be a four digit integer"
+            return True
+        
+        # setting the port number to global var
+        GlobalData_main.portForFileShare = int(port)
+        yield "port number setted to {}, now you can start the file share with this port".format(str(port))
+        return True
+
+
+
+
+
+
+    # if stop file share command is passed
+    if(GlobalMethods.isSubStringsList(command , "stop file")):
+
+        if(GlobalData_main.isFileShareStarted):
+            status = FileShareClass.stopFileShare()
+
+            if(not(status)):
+                yield "fileShare module could not stop the process"
+                return True
+        
+            yield "filShare Stopped successfully"
+            return True
+        
+        else:
+            yield "file share is not running"
+            return True
+
+
+
+    # if the start file share command is passed
+    if(GlobalMethods.isSubStringsList(command , "start file")):
+
+        status = FileShareClass.setSharePath()
+
+        if(not(status)):
+            yield "fileShare module could not get path, Try again"
+            return True
+
+        http = False
+
+        if(GlobalMethods.isSubStringsList(command , "http")):
+            http = True
+
+        result = FileShareClass.startFileShare(http=http)
+
+        if(result == None):
+            yield "fileShare module could not start the server, Try again"
+            return True
+
+        yield "clear screen"
+        for i in result:
+            yield str(i)
+            yield "\n"
+
+        return True
+
+    # if show file share command is passed
+    if(GlobalMethods.isSubStringsList(command , "show file")):
+
+        yield "clear screen"
+        
+        for i in GlobalData_main.dataListFileShare:
+            yield str(i)
+            yield "\n"
+
+        return True
         
 
 
@@ -758,23 +969,27 @@ def driver(command):
 
 
 
+    # if exit all command is passed
+    if(GlobalMethods.isSubStringsList(command , "exit all")):
+        if(GlobalData_main.isFileShareStarted):
+            try:
+                FileShareClass.stopFileShare()
+            except Exception as e:
+                GlobalData_main.objClogger.exception(str(e) , "Exception in closing the file share server at {} while exit all".format(str(FileShareClass.path)))
 
-
-
-
-
-
-
-
-
-
-
-
+        sys.exit()
 
 
     # if exit command is passed
     if(GlobalMethods.isSubStringsList(command , "exit")):
+        if(GlobalData_main.isFileShareStarted):
+            yield "could not quit the program, file share is already running, use stop file share to quit it first"
+            return True
+
         sys.exit()
+
+
+    
 
 
     else:
@@ -812,6 +1027,10 @@ def main():
         customClearScreen()
 
         userName = GlobalData_main.settingDict.get("username" , "sir")
+
+        for i in GlobalData_main.printDataList:
+            print(i)
+            print()
 
         # greeting the user
         print("Welcome {} , What can i do for you :)\n".format(userName))
