@@ -59,7 +59,7 @@ you can set the default city name in settings file.
 </br>
 </br>
 
-### 2. speed test
+### 2. Speed Test
 ```
 speed test
 ```
@@ -93,7 +93,7 @@ You can combine the commands
 </br>
 </br>
 
-# settings
+# Settings
 ```
 open setting
 ```
@@ -117,6 +117,48 @@ To restore the settings file to default value
 </br>
 Default settings file looks like - https://github.com/harshnative/Jarvis2.O/blob/main/defaultSettings.txt
 
+
+
+
+# File Share
+```
+start file share
+```
+To start a ftp server
+A window will be prompted to select the location to share
+
+</br>
+
+```
+start file share http
+```
+To start a http server
+If you cannot access the ftp server
+Remember you can only download files using http server
+</br>
+
+
+```
+stop file share
+```
+To stop file share
+</br>
+
+
+```
+set file share port PORTNUMBER
+```
+To set custom file share port if the default file share port is busy in your machine which is 5000
+
+were PORTNUMBER can be from 1000 to 9999
+</br>
+
+
+```
+show file share
+```
+Show the output created by file share again to see the exact intructions to connect
+</br>
 
 
 </br>
