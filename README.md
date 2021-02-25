@@ -117,3 +117,15 @@ To restore the settings file to default value
 </br>
 Default settings file looks like - https://github.com/harshnative/Jarvis2.O/blob/main/defaultSettings.txt
 
+
+
+</br>
+</br>
+</br>
+</br>
+
+# license
+Jarvis is licensed under GNU GENERAL PUBLIC LICENSE VERSION 3
+
+Visit www.letscodeofficial.com/gnuV3 for license terms
+
