@@ -6,10 +6,21 @@ New and better console based personal assistant
 </br>
 </br>
 
+
+# Website
+https://www.letscodeofficial.com/jarvis
+
+</br>
+</br>
+</br>
+
 # Download
 visit https://www.letscodeofficial.com/jarvis
 
 
+</br>
+</br>
+</br>
 
 # Improvement to previous Gen Jarvis
 link to previous gen jarvis - https://github.com/harshnative/JARVIS
@@ -165,9 +176,72 @@ show file share
 ```
 Show the output created by file share again to see the exact intructions to connect
 </br>
+</br>
 
+
+
+# Password Manager
+```
+password
+```
+To start password manager
 
 </br>
+
+For the first time you will need to set the password for encryption.
+
+password should be strong enough containing mixture of characters and min 8 chars in length.
+
+You can also set a custom path to database in settings file.
+</br>
+
+
+```
+-a
+```
+To add a password
+</br>
+
+
+
+```
+-u
+```
+To update a password
+</br>
+
+
+
+
+```
+-d
+```
+To delete a password
+</br>
+
+
+
+```
+-s
+```
+To see a password
+</br>
+
+
+
+```
+-sa
+```
+To see all password 
+</br>
+
+
+```
+-c
+```
+To change password 
+</br>
+
 </br>
 </br>
 </br>

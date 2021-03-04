@@ -7,6 +7,7 @@ import subprocess as sp
 from threading import Thread
 sys.path.append(os.path.join(os.path.dirname(__file__), '.'))
 from packages.logger import loggerpy 
+import multiprocessing
 
 
 
@@ -215,6 +216,7 @@ class LoadingAnimation(Thread):
 
 # starting in the main to avoide awakeness by sub processes
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
 
     # loading animation thread started 
     GlobalData_main.lAnimationObj = LoadingAnimation()
@@ -416,7 +418,7 @@ class WeatherFunctionality:
 
         # set the api key here
         # it is removed before commiting for security reasons
-        self.__apiKey = ""
+        self.__apiKey = "fe82651e607e46db61dba45e39aa7e17"
 
         # if the custom api key is not setted then the default api key present with the module will be used
         if(self.__apiKey != ""):
@@ -591,9 +593,8 @@ class FileShareClass:
     # else returns a list of output from module
     @classmethod
     def startFileShare(cls , http = False):
-        cls.fil.setPort(GlobalData_main.portForFileShare)
         try:
-            result = cls.fil.start_fileShare(cls.path , http=http)
+            result = cls.fil.start_fileShare(cls.path , http=http , port=GlobalData_main.portForFileShare)
             GlobalData_main.dataListFileShare = result
             GlobalData_main.addressForShare = cls.fil.get_ip_address()
             GlobalData_main.printDataList.append("File Share active at {}:{}".format(str(GlobalData_main.addressForShare) , str(GlobalData_main.portForFileShare)))
@@ -614,12 +615,15 @@ class FileShareClass:
             cls.fil.stopFileShare()
             cls.fil = FS.FileShareClass()
             GlobalData_main.printDataList.clear()
-            GlobalData_main.printDataList.remove("File Share active at {}:{}".format(str(GlobalData_main.addressForShare) , str(GlobalData_main.portForFileShare)))
+            try:
+            	GlobalData_main.printDataList.remove("File Share active at {}:{}".format(str(GlobalData_main.addressForShare) , str(GlobalData_main.portForFileShare)))
+            except Exception as e:
+            	GlobalData_main.printDataList.clear()
             GlobalData_main.isFileShareStarted = False
             GlobalData_main.objClogger.log("file share server stopped at {}".format(str(cls.path)) , "i")
             return True
         except Exception as e:
-            GlobalData_main.objClogger.exception(str(e) , "Exception in starting the file share server at {}".format(str(cls.path)))
+            GlobalData_main.objClogger.exception(str(e) , "Exception in stopping the file share server at {}".format(str(cls.path)))
             return False
 
 
@@ -1078,6 +1082,8 @@ def main():
 
 # main main 
 if __name__ == "__main__":
+    
+    multiprocessing.freeze_support()
 
     # closing the loading animation
     GlobalData_main.runLoadingAnimation = False
