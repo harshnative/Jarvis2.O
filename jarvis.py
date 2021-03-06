@@ -8,6 +8,7 @@ from threading import Thread
 sys.path.append(os.path.join(os.path.dirname(__file__), '.'))
 from packages.logger import loggerpy 
 import multiprocessing
+import sys
 
 
 
@@ -27,8 +28,9 @@ class GlobalData_main:
 
     # path for storing the program files
     folderPathWindows = r"C:\programData\JarvisData"
-    folderPathLinux = os.getcwd() + "/JarvisData"
+    folderPathLinux = ""
     folderPathWindows_simpleSlash = r"C:/programData/JarvisData"
+
 
     # obj for logger module
     objClogger = None
@@ -85,12 +87,19 @@ osUsing = platform.system()
 
 if(osUsing == "Linux"):
     GlobalData_main.isOnLinux = True
+    if(sys.argv[0] == "jarvis.py"):
+        GlobalData_main.folderPathLinux = os.getcwd() + "/JarvisData"
+    else:
+        GlobalData_main.folderPathLinux = "/opt/JarvisData"
 
     # making the program data folder
     try:
         os.mkdir(GlobalData_main.folderPathLinux)
     except FileExistsError:
         pass
+    except PermissionError:
+        print("\nPlease run jarvis using sudo")
+        sys.exit()
 
 elif(osUsing == "Windows"):
     GlobalData_main.isOnWindows = True
@@ -185,7 +194,12 @@ def customClearScreen():
 
 
 # setting up the logger module
-GlobalData_main.objClogger = loggerpy.Clogger(GlobalData_main.isOnWindows , GlobalData_main.isOnLinux , GlobalData_main.folderPathWindows_simpleSlash , GlobalData_main.folderPathLinux)
+try:
+    GlobalData_main.objClogger = loggerpy.Clogger(GlobalData_main.isOnWindows , GlobalData_main.isOnLinux , GlobalData_main.folderPathWindows_simpleSlash , GlobalData_main.folderPathLinux)
+except PermissionError:
+    print("\nPlease run jarvis using sudo")
+    sys.exit()
+
 GlobalData_main.objClogger.setTroubleShoot(GlobalData_main.troubleshootValue)
 
 
@@ -204,7 +218,7 @@ class LoadingAnimation(Thread):
         while(GlobalData_main.runLoadingAnimation and GlobalData_main.loadingAnimationCount):
             string = string + "."
             time.sleep(0.5)
-            print("\rloading , please wait " , string , sep = "" , end = "")
+            print("\rloading , please wait " , string , end = "")
             GlobalData_main.loadingAnimationCount -= 1
 
         print()
@@ -794,6 +808,7 @@ def driver(command):
         # if update setting command is passed
         if(GlobalMethods.isSubStringsList(command , "open")):
             if(Settings.openSettingsFile()):
+                yield "clear screen"
                 yield "Settings file opened"
                 yield "\nDon't forget to save it and run the update command after wards"
                 return

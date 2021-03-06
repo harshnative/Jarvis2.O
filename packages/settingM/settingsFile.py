@@ -80,7 +80,7 @@ pathForPassDB : None
                 os.startfile(self.path)
             else:
                 # using gedit on linux
-                os.system("gedit " + self.path)
+                os.system("sudo gedit " + self.path)
             return None
         except Exception as e:
             return str(e)
