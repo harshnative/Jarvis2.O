@@ -1,0 +1,15 @@
+Download JarvisWin for windows or Download Jarvis for linux(Debain/ubuntu)
+
+checkout installation guide windows - https://www.letscodeofficial.com/jarvis_downloadWindows2
+checkout installation guide linux - https://www.letscodeofficial.com/jarvis_downloadLinux2
+
+you can also build jarvis for other version of linux with guide present at  - https://www.letscodeofficial.com/jarvis_downloadLinux2
+ 
+
+Checkout the change log here - https://github.com/harshnative/Jarvis2.O/blob/main/changeLog.md
+
+Software website - https://www.letscodeofficial.com/jarvis
+
+Software documentation - https://www.letscodeofficial.com/jarvis_docs_home
+
+Software donation page - https://www.letscodeofficial.com/jarvis_contribute
