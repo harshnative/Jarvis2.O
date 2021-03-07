@@ -16,6 +16,9 @@ import sys
 # declaring some global variables
 class GlobalData_main:
 
+    # current version of software
+    currentVersion = 0.1
+
     # variables to determine the operating system of the user 
     isOnWindows = False
     isOnLinux = False
@@ -51,6 +54,9 @@ class GlobalData_main:
 
     # list holding info about running background operations
     printDataList = []
+
+    # toUpgradeJarvis handler
+    toUpgradeJarvis = False
 
 
 
@@ -266,6 +272,8 @@ if __name__ == "__main__":
 # importing additional modules
 from easyOpenWeather import module as owm
 from tabulate import tabulate
+import requests
+import webbrowser
 
 from packages.speedTest import speedTestFile
 from packages.settingM import settingsFile
@@ -668,11 +676,78 @@ class FileShareClass:
 
 
 
+
+
+
+class versionChecker(Thread):
+
+    def run(self):
+        try:
+
+            # getting the response from website api
+            response = requests.get("https://www.letscodeofficial.com/jarvis_version").json()
+            
+            # reponse is like [{"version": 0.1}] so getting the dict from index 0
+            dictResponse = response[0]
+
+            currentVersion = GlobalData_main.currentVersion
+            versionFromResponse = dictResponse.get('version')
+
+            # comparing the versions
+            if(versionFromResponse > currentVersion):
+                GlobalData_main.toUpgradeJarvis = True
+
+            GlobalData_main.objClogger.log("jarvis new version thread runned succesfully with toUpgradeJarvis = {}".format(str(GlobalData_main.toUpgradeJarvis)) , "i")
+
+        except Exception as e:
+                GlobalData_main.objClogger.exception(str(e) , "Exception in get version thread")
+
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # main driver function for executing commands
 def driver(command):
 
     """No print is used before main to keep the functions modular , just return the result to main in list form or yield form"""
     
+    # if the update jarvis command is passed
+    if(GlobalMethods.isSubStringsList(command , "update jarvis")):
+        try:
+            webbrowser.open("https://www.letscodeofficial.com/jarvis_downloads")
+            GlobalData_main.objClogger.log("started webbrowser to update jarvis" , "i")
+            yield "jarvis download page opened in a web browser"
+            return True
+
+        except Exception as e:
+            GlobalData_main.objClogger.exception(str(e) , "Exception in starting the webbrowser to update jarvis")
+            yield "could not open the download page in web browser"
+            yield "you can visit https://www.letscodeofficial.com/jarvis_downloads to download manually"
+            return True
+
+
+
+
 
     # if the weather command is passed
     if(GlobalMethods.isSubStringsList(command , "weather")):
@@ -689,7 +764,7 @@ def driver(command):
         if((cityNameFromSet == "None") and (len(cityName) <= 1)):
             yield "please pass the city name like weather london or set the default city name in settings file"
             yield "\nYou can open settings file by typing settings command"
-            return
+            return True
 
         # else if city is not passed then it will be taken from the settings file
         elif((len(cityName) <= 1)):
@@ -704,26 +779,32 @@ def driver(command):
         # if the api key is not set then return the message
         if(result == None):
             yield "please set the api key"
-            return
+            return True
         
         if(result == "error"):
             yield "please pass a correct city name"
-            return
+            return True
 
         # else conv the dict returned into list with [[key] , [value]]
         resultList = []
 
-        for i , j in result.items():
-            tempList = []
-            tempList.append(i)
-            tempList.append(j)
-            resultList.append(tempList)
+        try:
+            for i , j in result.items():
+                tempList = []
+                tempList.append(i)
+                tempList.append(j)
+                resultList.append(tempList)
+        except Exception as e:
+            GlobalData_main.objClogger.exception(str(e) , "Exception in getting the weather details of city = {}".format(str(cityName)))
+            yield "could not get the wheather details of city : {} , sorry :(".format(cityName)
+            return True
 
         # using the tabulate module to pretify the output
         toReturn = tabulate(resultList , headers=['Query', 'Data'])
 
         # returning the result so it can be printed
         yield toReturn
+        return True
 
 
 
@@ -768,7 +849,7 @@ def driver(command):
         for i in sObj.runSpeedTestUtility(inBytes=inBytes , numberOfTimesToDo=numberOfTimes):
             yield i
         
-        return
+        return True
 
 
 
@@ -797,13 +878,13 @@ def driver(command):
         if(GlobalMethods.isSubStringsList(command , "update")):
             GlobalData_main.settingDict = Settings.returnDict()
             yield "new settings applied ..."
-            return
+            return True
         
         # if update setting command is passed
         if(GlobalMethods.isSubStringsList(command , "restore")):
             Settings.restoreSettings()
             yield "settings restored to default values ..."
-            return
+            return True
 
         # if update setting command is passed
         if(GlobalMethods.isSubStringsList(command , "open")):
@@ -811,10 +892,10 @@ def driver(command):
                 yield "clear screen"
                 yield "Settings file opened"
                 yield "\nDon't forget to save it and run the update command after wards"
-                return
+                return True
             else:
                 yield "Error opening the settings file , Try running the troubleshoot command"
-                return
+                return True
 
 
 
@@ -1067,6 +1148,10 @@ def main():
 
         userName = GlobalData_main.settingDict.get("username" , "sir")
 
+        if(GlobalData_main.toUpgradeJarvis):
+            print("New version of jarvis is available, run update jarvis command to download the new version")
+            print()
+
         for i in GlobalData_main.printDataList:
             print(i)
             print()
@@ -1132,6 +1217,10 @@ if __name__ == "__main__":
             print("\n\nPress enter to continue")
             input()
             sys.exit()
+
+
+    versionCheckerObj = versionChecker()
+    versionCheckerObj.start()
 
 
     # main will be called
