@@ -15,7 +15,7 @@ https://www.letscodeofficial.com/jarvis
 </br>
 
 # Download
-visit https://www.letscodeofficial.com/jarvis
+visit https://www.letscodeofficial.com/jarvis_downloads
 
 
 </br>

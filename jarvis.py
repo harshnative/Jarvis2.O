@@ -1219,6 +1219,8 @@ if __name__ == "__main__":
             sys.exit()
 
 
+    # starting the version checker thread
+    # once the thread finishes and lastest new version is found then toUpgrade handler will be set to True in global data class which will be picked by the if statement in main function
     versionCheckerObj = versionChecker()
     versionCheckerObj.start()
 
