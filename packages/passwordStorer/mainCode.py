@@ -268,6 +268,7 @@ class PasswordStorerClass:
                 dataList.append(i[1:])
 
             pd.set_option("display.max_rows", None)
+            pd.set_option("display.max_colwidth", int((os.get_terminal_size()[0]/2) - 5))
             dataFrame = pd.DataFrame(dataList , columns=["reference" , "password"] , index=indexList)
             dataFrame.index.name = "ID"
             print(dataFrame)
@@ -336,7 +337,7 @@ class PasswordStorerClass:
                 print("If this error occurs on windows , try updating the windows")
                 input("\n\nPress enter to continue...")
                 return
-                
+
             print("\n\nPassword copied to clipboard...")
             time.sleep(0.9)
 
