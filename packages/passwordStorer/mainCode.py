@@ -1,16 +1,91 @@
 import subprocess as sp
 import os
-from typing import ValuesView
 import stdiomask
 from .eSqlite import SQLiteConnect
 import sys
-
+import pandas as pd
+import pyperclip
+import time
 
 
 # function to input password in hash form
 def hashPasswordInput(message):
     password = stdiomask.getpass(message)
     return password
+
+
+
+
+# class containing some of the global methods
+class GlobalMethods:
+
+    # method for comparing if a string as a certain substring
+    @classmethod
+    def isSubString(cls , string , subString):
+        lengthOfSubString = len(subString)
+        try:
+            """ for substring to be string - 
+                1. check if the first of substring matches the string as certain i position
+                2. for that i , check wheather the next characters also matches the substring till i + length of substring"""
+
+            for i, j in enumerate(string):
+                if(j == subString[0]):
+                    if(subString == string[i:i+lengthOfSubString]):
+                        
+                        # logging the result for debugging purpose
+                        return True
+                    else:
+                        pass
+
+            # logging the result for debugging purpose
+            return False
+
+        except Exception as e:
+
+            # logging the error
+            return False
+
+
+
+    # method for checking if the substring is in string using list
+    @classmethod
+    def isSubStringsList(cls , string , subString):
+
+        """ This method check is this way :
+            normal substring check - string(hello world , this is jarvis) , subString(this jarvis) -> False
+            using list substring check - string(hello world , this is jarvis) , subString(this jarvis) -> True
+            compares the invidual words as substring"""
+
+        # converting them to same case
+        string = string.upper()
+        subString = subString.upper()
+
+        # getting the list of words in substring sperated by space
+        subStringList = subString.split()
+
+        # vars to keep track of number of successfull comparisions
+        count1 = 0
+        count2 = 0
+
+        for i in subStringList:
+            # striping the leading and trailing spaces of word in sub string list
+            i = i.strip()
+
+            # increasing the count1 as we have traversed a word
+            count1 += 1
+
+            # if this word is also a substring then we increase the count2 as well
+            if(cls.isSubString(string , i)):
+                count2 += 1
+            else:
+                # returned false as now substring is not in string
+                return False
+
+        # if the count1 matches the count2 and count1 should be greater than 0 then substring is in string
+        if((count1 == count2) and count1 > 0):
+            return True
+        else:
+            return False
 
 
 
@@ -181,10 +256,22 @@ class PasswordStorerClass:
 
 
     # function to display all data in db
-    def displayAll(self):
-        self.dbObj.printData()
+    def displayAll(self , all=False):
+        if(all):
+            self.dbObj.printData()
+        else:
+            data = self.dbObj.returnData()
+            indexList = []
+            dataList = []
+            for i in data[1:]:
+                indexList.append(i[0])
+                dataList.append(i[1:])
 
-    
+            pd.set_option("display.max_rows", None)
+            dataFrame = pd.DataFrame(dataList , columns=["reference" , "password"] , index=indexList)
+            dataFrame.index.name = "ID"
+            print(dataFrame)
+
 
     # function to interpret the command and exceute it
     def executeCommand(self , command):
@@ -192,7 +279,7 @@ class PasswordStorerClass:
         command = str(command.strip())
 
         # if the -a or add command is passed
-        if((command == "-a") or (command == "add")):
+        if((GlobalMethods.isSubStringsList(command , "-a")) or (GlobalMethods.isSubStringsList(command , "add"))):
             self.customClearScreen()
 
             # input the data in data col and data in pass col 
@@ -200,7 +287,8 @@ class PasswordStorerClass:
             password = input("Enter the password : ")
 
             # if the user by mistake enter the command then pressing enter enter in above input will not lead to insertion in db
-            if((data == "") and (password == "")):
+            if((data == "") or (password == "")):
+                input("\nAdding process cancelled by user , press enter to continue")
                 return
 
 
@@ -212,16 +300,60 @@ class PasswordStorerClass:
 
 
         # if -sa or see all command is passed
-        elif((command == "-sa") or (command == "see all")):
+        elif((GlobalMethods.isSubStringsList(command , "-sa")) or (GlobalMethods.isSubStringsList(command , "see all"))):
             self.customClearScreen()
-            self.displayAll()
-            input()
+            
+            if(GlobalMethods.isSubStringsList(command , "all")):
+                self.displayAll(True)
+            else:
+                self.displayAll()
+
+            index = input("\n\nEnter index number to copy password or Enter to continue : ")
+
+            if(index == ""):
+                return
+            
+            try:
+                index = int(index)
+            except ValueError:
+                print("\n\nWrong index number...")
+                time.sleep(0.9)
+                return
+
+            data = self.dbObj.returnDataOfKey(index)
+
+            if(data == None):
+                print("\n\nWrong index number...")
+                time.sleep(0.9)
+                return
+            
+            try:
+                pyperclip.copy(data[0][2])
+            except NotImplementedError:
+                print("\n\nJarvis could not find the copy paste mechanism on your machine.")
+                print("This happens with linux users , you will need to install copy paste mechanism")
+                print("On Ubuntu/debain you can install it via sudo apt-get install xclip")
+                print("If this error occurs on windows , try updating the windows")
+                input("\n\nPress enter to continue...")
+                return
+                
+            print("\n\nPassword copied to clipboard...")
+            time.sleep(0.9)
+
+
+            
+
+
 
 
         # if -u or update command is passed
-        elif((command == "-u") or (command == "update")):
+        elif((GlobalMethods.isSubStringsList(command , "-u")) or (GlobalMethods.isSubStringsList(command , "update"))):
             self.customClearScreen()
-            self.displayAll()
+
+            if(GlobalMethods.isSubStringsList(command , "all")):
+                self.displayAll(True)
+            else:
+                self.displayAll()
 
             key = 0
 
@@ -255,10 +387,12 @@ class PasswordStorerClass:
 
 
         # if the delete command or -d is passed
-        elif((command == "-d") or (command == "delete")):
+        elif((GlobalMethods.isSubStringsList(command , "-d")) or (GlobalMethods.isSubStringsList(command , "delete"))):
 
-            self.customClearScreen()
-            self.displayAll()
+            if(GlobalMethods.isSubStringsList(command , "all")):
+                self.displayAll(True)
+            else:
+                self.displayAll()
 
             key = 0
 
@@ -296,7 +430,7 @@ class PasswordStorerClass:
 
 
         # if the see or -s command is passed
-        elif((command == "-s") or (command == "see")):
+        elif((GlobalMethods.isSubStringsList(command , "-s")) or (GlobalMethods.isSubStringsList(command , "see"))):
             self.customClearScreen()
 
 
@@ -322,11 +456,41 @@ class PasswordStorerClass:
             # display the areas were the data matches
             self.dbObj.tabulatePrinter(printList , returnedData[0])
 
-            input()
+            index = input("\n\nEnter index number to copy password or Enter to continue : ")
+
+            if(index == ""):
+                return
+            
+            try:
+                index = int(index)
+            except ValueError:
+                print("\n\nWrong index number...")
+                time.sleep(0.9)
+                return
+
+            data = self.dbObj.returnDataOfKey(index)
+
+            if(data == None):
+                print("\n\nWrong index number...")
+                time.sleep(0.9)
+                return
+            
+            try:
+                pyperclip.copy(data[0][2])
+            except NotImplementedError:
+                print("\n\nJarvis could not find the copy paste mechanism on your machine.")
+                print("This happens with linux users , you will need to install copy paste mechanism")
+                print("On Ubuntu/debain you can install it via sudo apt-get install xclip")
+                print("If this error occurs on windows , try updating the windows")
+                input("\n\nPress enter to continue...")
+                return
+
+            print("\n\nPassword copied to clipboard...")
+            time.sleep(0.9)
 
 
         # if -c or change password command is passed
-        elif((command == "-c") or (command == "change password")):
+        elif((GlobalMethods.isSubStringsList(command , "-c")) or (GlobalMethods.isSubStringsList(command , "change password"))):
 
             oldPass = ""
             oldPin = 123456

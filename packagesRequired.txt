@@ -7,3 +7,6 @@ onetimepad
 speedtest-cli
 pyinstaller
 stdiomask
+pyperclip
+numpy
+pandas

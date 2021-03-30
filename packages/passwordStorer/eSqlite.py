@@ -367,7 +367,7 @@ class SQLiteConnect:
                 table.append(tempTable) 
 
         if(found):
-            print(tabulate(table, headers=colList))
+            print(tabulate(table, headers=colList , tablefmt="fancy_grid"))
         else:
             print(errorMessage)
 
@@ -436,14 +436,14 @@ class SQLiteConnect:
             table.append(tempTable)
 
         if(found):
-            print(tabulate(table, headers=colList))
+            print(tabulate(table, headers=colList , tablefmt="fancy_grid"))
         else:
             print(errorMessage)
 
 
     # in built tabulate printer
     def tabulatePrinter(self , table , headersList):
-        print(tabulate(table, headers=headersList))
+        print(tabulate(table, headers=headersList , tablefmt="fancy_grid"))
 
 
 
