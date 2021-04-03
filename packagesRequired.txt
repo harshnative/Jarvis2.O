@@ -1,12 +1,1 @@
-easyOpenWeather==0.3
-tabulate
-tkinter
-easyFileShare
-cryptography
-onetimepad
-speedtest-cli
-pyinstaller
-stdiomask
-pyperclip
-numpy
-pandas
+Listed in requirements.txt + tkinter
