@@ -643,6 +643,7 @@ class FileShareClass:
             	GlobalData_main.printDataList.clear()
             GlobalData_main.isFileShareStarted = False
             GlobalData_main.objClogger.log("file share server stopped at {}".format(str(cls.path)) , "i")
+            
             return True
         except Exception as e:
             GlobalData_main.objClogger.exception(str(e) , "Exception in stopping the file share server at {}".format(str(cls.path)))
@@ -697,7 +698,7 @@ class versionChecker(Thread):
             if(versionFromResponse > currentVersion):
                 GlobalData_main.toUpgradeJarvis = True
 
-            GlobalData_main.objClogger.log("jarvis new version thread runned succesfully with toUpgradeJarvis = {}".format(str(GlobalData_main.toUpgradeJarvis)) , "i")
+            GlobalData_main.objClogger.log("jarvis new version thread runned succesfully with version from response = {} and current version = {}".format(str(versionFromResponse) , str(currentVersion)) , "i")
 
         except Exception as e:
                 GlobalData_main.objClogger.exception(str(e) , "Exception in get version thread")
@@ -1039,7 +1040,7 @@ def driver(command):
         result = FileShareClass.startFileShare(http=http)
 
         if(result == None):
-            yield "fileShare module could not start the server, Try again"
+            yield "fileShare module could not start the server, Try try restarting the jarvis"
             return True
 
         yield "clear screen"

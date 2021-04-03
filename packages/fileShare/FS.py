@@ -5,6 +5,8 @@ import os
 import socket
 from os import path
 import multiprocessing
+import sys
+from importlib import reload
 
 import logging
 from pyftpdlib.log import config_logging
@@ -148,24 +150,11 @@ class FileShareClass:
             self.mulProcess1.terminate()
         else:
             self.mulProcess2.terminate()
-        
 
-        # resetting the module to original state
-        import http.server
-        from socket import error, setdefaulttimeout
-        import socketserver
-        import os
-        import socket
-        from os import path
-        import multiprocessing
-
-        import logging
-        from pyftpdlib.log import config_logging
-
-
-        from pyftpdlib import servers
-        from pyftpdlib.handlers import FTPHandler
-        from pyftpdlib.authorizers import DummyAuthorizer
+        modulenames = set(sys.modules) & set(globals())
+        allmodules = [sys.modules[name] for name in modulenames]
+        for i in allmodules:
+            reload(i)
 
         self.__init__()
 
