@@ -11,6 +11,8 @@
 
 6. added table formatting to tabulate in password module
 
+7. added update jarvis command
+
 
 # v0.1
 

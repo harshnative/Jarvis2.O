@@ -54,7 +54,7 @@ class SettingsClass:
         # default settings file data
         settingsFile = """
 # username - comes instead of sir in greeting line - welcome { username }
-username : sir
+username : None
 
 
 # deafult city name for weather data

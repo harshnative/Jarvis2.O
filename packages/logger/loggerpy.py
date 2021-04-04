@@ -84,6 +84,9 @@ methods included - setTroubleShoot()    ->    used to set the the log level -
         stringPass = "In : " + PlaceOfException + " Exception Occured - " + exceptionPass
         logging.error(str(stringPass))
 
+    def returnLogFilePath(self):
+        return str(self.logFileName)
+
 if __name__ == "__main__":
     objClogger = Clogger()
     print(objClogger.__doc__)

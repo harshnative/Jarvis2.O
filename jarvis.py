@@ -9,7 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '.'))
 from packages.logger import loggerpy 
 import multiprocessing
 import sys
-
+import getpass
 
 
 
@@ -37,7 +37,7 @@ class GlobalData_main:
 
     # obj for logger module
     objClogger = None
-    troubleshootValue = True
+    troubleshootValue = False
 
     # dict from the settings file will be stored here
     settingDict = None
@@ -58,17 +58,23 @@ class GlobalData_main:
     # toUpgradeJarvis handler
     toUpgradeJarvis = False
 
+    # username in setting + username in PC storer
+    userCP = ""
+
+    # tempInputter
+    tempInput = ""
+    tempInputToShow = ""
+
+    # driver function reference
+    driverFuncReference = None
 
 
 
 
-
-
-
-
-
-
-
+# function to reset the temp input values
+def resetTempInput():
+    GlobalData_main.tempInput = ""
+    GlobalData_main.tempInputToShow = ""
 
 
 
@@ -94,6 +100,7 @@ osUsing = platform.system()
 if(osUsing == "Linux"):
     GlobalData_main.isOnLinux = True
     if(sys.argv[0] == "jarvis.py"):
+        GlobalData_main.troubleshootValue = True
         GlobalData_main.folderPathLinux = os.getcwd() + "/JarvisData"
     else:
         GlobalData_main.folderPathLinux = "/opt/JarvisData"
@@ -199,15 +206,19 @@ def customClearScreen():
 
 
 
-# setting up the logger module
-try:
-    GlobalData_main.objClogger = loggerpy.Clogger(GlobalData_main.isOnWindows , GlobalData_main.isOnLinux , GlobalData_main.folderPathWindows_simpleSlash , GlobalData_main.folderPathLinux)
-except PermissionError:
-    print("\nPlease run jarvis using sudo")
-    sys.exit()
+def resetLoggerObj():
+    # setting up the logger module
+    try:
+        GlobalData_main.objClogger = loggerpy.Clogger(GlobalData_main.isOnWindows , GlobalData_main.isOnLinux , GlobalData_main.folderPathWindows_simpleSlash , GlobalData_main.folderPathLinux)
+    except PermissionError:
+        print("\nPlease run jarvis using sudo")
+        sys.exit()
 
-GlobalData_main.objClogger.setTroubleShoot(GlobalData_main.troubleshootValue)
+    GlobalData_main.objClogger.setTroubleShoot(GlobalData_main.troubleshootValue)
 
+
+if __name__ == "__main__":
+    resetLoggerObj()
 
 
 
@@ -274,6 +285,7 @@ from easyOpenWeather import module as owm
 from tabulate import tabulate
 import requests
 import webbrowser
+import datetime
 
 from packages.speedTest import speedTestFile
 from packages.settingM import settingsFile
@@ -515,7 +527,12 @@ class Settings:
     # method to return the dict
     @classmethod
     def returnDict(cls):
-        returnedDict = cls.settingObj.getDict()
+        try:
+            returnedDict = cls.settingObj.getDict()
+            GlobalData_main.objClogger.log("settings dict returned successfully in returnDict function in settings class with dict = {}".format(returnedDict) , "i")
+        except Exception as e:
+            GlobalData_main.objClogger.exception(str(e) , "error in settingObj.getDict() function")
+
         return returnedDict
 
     # method to open the settings file
@@ -526,6 +543,7 @@ class Settings:
         result = cls.settingObj.openSettings()
 
         if(result == None):
+            GlobalData_main.objClogger.log("settings file opened successfully" , "i")
             return True
         else:
             GlobalData_main.objClogger.exception(str(result) , "Exception in opening the settings file")
@@ -535,7 +553,14 @@ class Settings:
     # method to restore the settings file with default settings
     @classmethod
     def restoreSettings(cls):
-        cls.settingObj.regenerateSettingsFile()
+        try:
+            cls.settingObj.regenerateSettingsFile()
+            GlobalData_main.objClogger.log("settings file restored succesfully successfully" , "i")
+            return True
+        except Exception as e:
+            GlobalData_main.objClogger.exception(str(e) , "error in restoring the settings file")
+            return False
+
 
 
 
@@ -600,6 +625,7 @@ class FileShareClass:
     def setSharePath(cls):
         try:
             folder_selected = filedialog.askdirectory()
+            GlobalData_main.objClogger.log("file share path setted successfully" , "i")
         except Exception as e:
             GlobalData_main.objClogger.exception(str(e) , "Exception in getting folder path from tkinter window")
             return False
@@ -708,6 +734,155 @@ class versionChecker(Thread):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class TroubleShooter:
+
+    @classmethod
+    def uploadFile(cls):
+        # getting the log file path
+        logFilePath = GlobalData_main.objClogger.returnLogFilePath()
+
+        # opening the log file and storing it in variable
+        try:
+            logFile = open(logFilePath , 'rb')
+            GlobalData_main.objClogger.log("Log file get procedure done successfully in TroubleShooter upload file function" , "i")
+        except Exception as e:
+            GlobalData_main.objClogger.exception(str(e) , "Could not get the log file")
+            return 0
+        
+        # uploading the file to the server api using request method
+        try:
+            response = requests.post('https://letscodeofficial.com/upload_jarvisLog/' , files={"file": logFile} , data={"remark" : str(GlobalData_main.userCP + " upload on {}".format(str(datetime.datetime.now())))})
+            GlobalData_main.objClogger.log("Log file uploaded successfully in Troubleshooter class upload file function with remark value = {}".format(str(GlobalData_main.userCP + " upload on {}".format(str(datetime.datetime.now())))) , "i")
+        except ConnectionError:
+            return 1
+        except Exception as e:
+            GlobalData_main.objClogger.exception(str(e) , "Error in uploading the log file")
+            return 2
+
+        # checking the response from the api 
+        if(str(response) == "<Response [201]>"):
+            return 3
+        else:
+            GlobalData_main.objClogger.log("response = {} in tourbleshooter class upload file function".format(response) , "e")
+            return 4
+
+
+
+    @classmethod
+    def startTroubleshooter(cls):
+
+        
+        # showing the declaration
+        yield "clear screen"
+        yield "You are entering the troubleshooter.\n"
+        yield "Program will log some info regarding errors and then upload the log file to server.Program will log some info regarding errors and then upload the log file to server.\n"
+        yield "Logger does not log any sensitive information, but commands runned during troubleshooter and info of function runned by those commands will be logged.\n"
+        
+        # accepting the user aggrement to data share
+        resetTempInput()
+        GlobalData_main.tempInputToShow = "\n\nType yes to continue or anything else to quit : "
+        yield "#take input#"
+        continueORnot = GlobalData_main.tempInput
+        resetTempInput()
+
+        if(not(continueORnot.lower().strip() == "yes")):
+            yield "\n\nTrouble shoot ended..."
+            return
+
+        # resetting the troubleshooter with INFO LEVEL logging
+        GlobalData_main.troubleshootValue = True
+        resetLoggerObj()
+
+        # telling user to run the command again which caused the error
+        yield "clear screen"
+        yield "\n\nCan you please run the command again which caused error :)\n"
+
+        resetTempInput()
+        GlobalData_main.tempInputToShow = "Enter Command : "
+        yield "#take input#"
+        command = GlobalData_main.tempInput
+        resetTempInput()
+
+        yield "clear screen"
+
+        # priting the result from driver function
+        for i in GlobalData_main.driverFuncReference(command):
+            yield i
+
+        resetTempInput()
+        GlobalData_main.tempInputToShow = "\n\nPress enter to upload log : "
+        yield "#take input#"
+        resetTempInput()
+
+        yield "\n\nUploading log file to server please wait ..."
+
+        result = cls.uploadFile()
+
+        yield "clear screen"
+
+        if(result == 0):
+            yield "jarvis could not get the log file"
+
+        elif(result == 1):
+            yield "jarvis is not connected to network, you should run upload log file command when internet comes back"
+        
+        elif(result == 2):
+            yield "jarvis could not upload the log file to server, you may mail it at letscodeoffical.com with title = 'jarvis logs' , log file is present at path = {}".format(GlobalData_main.objClogger.returnLogFilePath())
+        
+        elif(result == 3):
+            yield "jarvis log file uploaded successfully to server , jarvis team will investigate the bug now"
+        
+        elif(result == 4):
+            yield "jarvis could not upload the log file to server, you may mail it at letscodeoffical.com with title = 'jarvis logs' , log file is present at path = {}".format(GlobalData_main.objClogger.returnLogFilePath())
+
+
+        
+
+    @classmethod
+    def uploadFileAgain(cls):
+        yield "clear screen"
+        yield "\n\nUploading log file to server please wait ..."
+
+        result = cls.uploadFile()
+
+        yield "clear screen"
+
+        if(result == 0):
+            yield "jarvis could not get the log file"
+
+        elif(result == 1):
+            yield "jarvis is not connected to network, you should run upload log file command when internet comes back"
+        
+        elif(result == 2):
+            yield "jarvis could not upload the log file to server, you may mail it at letscodeoffical.com with title = 'jarvis logs' , log file is present at path = {}".format(GlobalData_main.objClogger.returnLogFilePath())
+        
+        elif(result == 3):
+            yield "jarvis log file uploaded successfully to server , jarvis team will investigate the bug now"
+        
+        elif(result == 4):
+            yield "jarvis could not upload the log file to server, you may mail it at letscodeoffical.com with title = 'jarvis logs' , log file is present at path = {}".format(GlobalData_main.objClogger.returnLogFilePath())
 
 
 
@@ -883,8 +1058,12 @@ def driver(command):
         
         # if update setting command is passed
         if(GlobalMethods.isSubStringsList(command , "restore")):
-            Settings.restoreSettings()
-            yield "settings restored to default values ..."
+            result = Settings.restoreSettings()
+            if(result):
+                yield "settings restored to default values ..."
+            else:
+                yield "error in restoring the settings file , try running troubleshoot command"
+
             return True
 
         # if update setting command is passed
@@ -1060,6 +1239,20 @@ def driver(command):
             yield "\n"
 
         return True
+
+    # if troubleshoot command is passed
+    if((GlobalMethods.isSubStringsList(command , "troubleshoot")) or (GlobalMethods.isSubStringsList(command , "trouble shoot"))):
+        for i in TroubleShooter.startTroubleshooter():
+            yield i
+        return True
+
+    # if the upload log file command is passed
+    if(GlobalMethods.isSubStringsList(command , "upload log file")):
+        for i in TroubleShooter.uploadFileAgain():
+            yield i
+        return True
+
+        
         
 
 
@@ -1147,7 +1340,14 @@ def main():
     while(True):
         customClearScreen()
 
-        userName = GlobalData_main.settingDict.get("username" , "sir")
+        userName = GlobalData_main.settingDict.get("username" , "None")
+
+        if(userName == "None"):
+            userName = getpass.getuser()
+            GlobalData_main.userCP = "settings = None , PC = " + str(userName)
+        else:
+            GlobalData_main.userCP = "settings = {} , PC = {}".format(userName , getpass.getuser())
+
 
         if(GlobalData_main.toUpgradeJarvis):
             print("New version of jarvis is available, run update jarvis command to download the new version")
@@ -1167,7 +1367,10 @@ def main():
 
         # priting the result from driver function
         for i in driver(command):
-            if(i == "clear screen"):
+            if(i == "#take input#"):
+                inputted = input(GlobalData_main.tempInputToShow)
+                GlobalData_main.tempInput = inputted
+            elif(i == "clear screen"):
                 customClearScreen()
             else:
                 print(i)
@@ -1224,7 +1427,9 @@ if __name__ == "__main__":
     # once the thread finishes and lastest new version is found then toUpgrade handler will be set to True in global data class which will be picked by the if statement in main function
     versionCheckerObj = versionChecker()
     versionCheckerObj.start()
-
+    
+    # creating a driver function reference to be used by troubleshoot class
+    GlobalData_main.driverFuncReference = driver
 
     # main will be called
     main()
