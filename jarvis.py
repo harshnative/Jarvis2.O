@@ -15,8 +15,12 @@ import getpass
 
 # declaring some global variables
 class GlobalData_main:
+
     # letscode api key
     lcApiKey = ""
+
+    # key for open weather api
+    openWeatherApiKey = ""
 
     # current version of software
     currentVersion = 0.1
@@ -104,6 +108,7 @@ if(osUsing == "Linux"):
     if(sys.argv[0] == "jarvis.py"):
         GlobalData_main.troubleshootValue = True
         GlobalData_main.folderPathLinux = os.getcwd() + "/JarvisData"
+
     else:
         GlobalData_main.folderPathLinux = "/opt/JarvisData"
 
@@ -291,7 +296,9 @@ import datetime
 
 from packages.speedTest import speedTestFile
 from packages.settingM import settingsFile
+from packages.settingM import txtJson
 from packages.passwordStorer import mainCode
+from packages.apiStorage import apiStorer
 
 
 
@@ -429,6 +436,25 @@ class GlobalMethods:
 
 
 
+def setApis():
+    GlobalData_main.lcApiKey = apiStorer.StorageClass.letsCodeApi
+    GlobalData_main.openWeatherApiKey = apiStorer.StorageClass.openWeatherApi
+
+
+if __name__ == "__main__":
+    # setting up the api
+    setApis()
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -454,7 +480,7 @@ class WeatherFunctionality:
 
         # set the api key here
         # it is removed before commiting for security reasons
-        self.__apiKey = "fe82651e607e46db61dba45e39aa7e17"
+        self.__apiKey = GlobalData_main.openWeatherApiKey
 
         # if the custom api key is not setted then the default api key present with the module will be used
         if(self.__apiKey != ""):
@@ -587,14 +613,6 @@ class Settings:
 
 class Help:
     pass
-
-
-
-
-
-
-
-
 
 
 
