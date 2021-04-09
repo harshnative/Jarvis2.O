@@ -15,6 +15,8 @@ import getpass
 
 # declaring some global variables
 class GlobalData_main:
+    # letscode api key
+    lcApiKey = ""
 
     # current version of software
     currentVersion = 0.1
@@ -712,7 +714,7 @@ class versionChecker(Thread):
         try:
 
             # getting the response from website api
-            response = requests.get("https://www.letscodeofficial.com/jarvis_version").json()
+            response = requests.post("https://www.letscodeofficial.com/jarvis_version" , data={"key" : GlobalData_main.lcApiKey}).json()
             
             # reponse is like [{"version": 0.1}] so getting the dict from index 0
             dictResponse = response[0]
@@ -773,7 +775,7 @@ class TroubleShooter:
         
         # uploading the file to the server api using request method
         try:
-            response = requests.post('https://letscodeofficial.com/upload_jarvisLog/' , files={"file": logFile} , data={"remark" : str(GlobalData_main.userCP + " upload on {}".format(str(datetime.datetime.now())))})
+            response = requests.post('https://letscodeofficial.com/upload_jarvisLog/' , files={"file": logFile} , data={"key" : GlobalData_main.lcApiKey , "remark" : str(GlobalData_main.userCP + " upload on {}".format(str(datetime.datetime.now())))})
             GlobalData_main.objClogger.log("Log file uploaded successfully in Troubleshooter class upload file function with remark value = {}".format(str(GlobalData_main.userCP + " upload on {}".format(str(datetime.datetime.now())))) , "i")
         except ConnectionError:
             return 1
@@ -1397,6 +1399,12 @@ if __name__ == "__main__":
     if(GlobalData_main.troubleshootValue):
         print("\nIn dev Mode \n")
         time.sleep(0.5)
+    
+    # check for the LC api key and print a message if not setted up
+    if((GlobalData_main.lcApiKey == None) or (GlobalData_main.lcApiKey == "")):
+        print("lets code api key not setted")
+        time.sleep(0.7)
+
 
     customClearScreen()
 
