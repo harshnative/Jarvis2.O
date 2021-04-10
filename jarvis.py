@@ -74,6 +74,10 @@ class GlobalData_main:
     # driver function reference
     driverFuncReference = None
 
+    # auto complete reference list
+    autoCompleteReference = None
+
+
 
 
 
@@ -293,6 +297,10 @@ from tabulate import tabulate
 import requests
 import webbrowser
 import datetime
+from prompt_toolkit import PromptSession
+from prompt_toolkit.completion import WordCompleter
+from prompt_toolkit.lexers import PygmentsLexer
+
 
 from packages.speedTest import speedTestFile
 from packages.settingM import settingsFile
@@ -444,6 +452,10 @@ def setApis():
 if __name__ == "__main__":
     # setting up the api
     setApis()
+
+    # setting up values in auto completer
+    GlobalData_main.autoCompleteReference = WordCompleter(['weather' , 'update' , 'jarvis' , 'speed' , 'test' , 'setting' , 'restore' , 'open' , 'password' , 'set' , 'file' , 'port' , 'stop' , 'start' , 'show' , 'upload' , 'log' , 'troubleshoot' , 'exit' , 'all'], ignore_case=True)
+
 
 
 
@@ -1260,6 +1272,17 @@ def driver(command):
 
         return True
 
+
+
+
+
+
+
+
+
+
+
+
     # if troubleshoot command is passed
     if((GlobalMethods.isSubStringsList(command , "troubleshoot")) or (GlobalMethods.isSubStringsList(command , "trouble shoot"))):
         for i in TroubleShooter.startTroubleshooter():
@@ -1356,6 +1379,10 @@ def driver(command):
 # main function for inputting commands
 def main():
 
+
+    session = PromptSession(completer=GlobalData_main.autoCompleteReference)
+
+
     # running until exit is called in driver
     while(True):
         customClearScreen()
@@ -1381,7 +1408,8 @@ def main():
         print("Welcome {} , What can i do for you :)\n".format(userName))
 
         # inputting the command
-        command = input("Enter Command : ")
+        # command = input("Enter Command : ")
+        command = session.prompt('Enter Command : ')
 
         customClearScreen()
 
