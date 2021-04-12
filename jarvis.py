@@ -77,6 +77,30 @@ class GlobalData_main:
     # auto complete reference list
     autoCompleteReference = None
 
+    # search reference dict
+    searchDict = {'weather': {}, 
+                'update': {}, 
+                'jarvis': {}, 
+                'speed': {}, 
+                'test': {}, 
+                'setting': {}, 
+                'restore': {}, 
+                'open': {}, 
+                'password': {}, 
+                'set': {}, 
+                'file': {}, 
+                'port': {}, 
+                'stop': {}, 
+                'start': {}, 
+                'show': {}, 
+                'upload': {}, 
+                'log': {}, 
+                'troubleshoot': {}, 
+                'exit': {}, 
+                'all': {},
+                '-b': {},
+                }
+
 
 
 
@@ -297,9 +321,15 @@ from tabulate import tabulate
 import requests
 import webbrowser
 import datetime
+
+# for auto completion
 from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.lexers import PygmentsLexer
+
+
+# for adv search 
+from fast_autocomplete import AutoComplete
 
 
 from packages.speedTest import speedTestFile
@@ -351,6 +381,61 @@ if __name__ == "__main__":
 # class containing some of the global methods
 class GlobalMethods:
 
+    # setting up the adv search obj
+    advSearchObj = AutoComplete(words=GlobalData_main.searchDict)
+
+
+
+    # method for correcting the incorrect spelling
+    @classmethod
+    def correctCommand(cls , command):
+        try:
+            command = str(command)
+
+            commandList = command.split()
+
+            newCommand = ""
+
+            for i in commandList:
+                result = cls.advSearchObj.search(word=i)
+                
+                try:
+                    result = result[0]
+                    GlobalData_main.objClogger.log("adv search found result[0] in result in Globalmethods class correctCommad function with result = {} and searchString = {}".format(result , i) , "i")
+
+                except IndexError:
+                    newCommand = newCommand + i + " "
+                    GlobalData_main.objClogger.log("adv search Index error in Globalmethods class correctCommad function with result = {} and searchString = {}".format(result , i) , "i")
+
+
+
+                # if result contains more than 1 string then simply add old command
+                # as program can cannot determine the exact command
+                if(len(result) != 1):
+                    newCommand = newCommand + i + " "
+                    GlobalData_main.objClogger.log("adv search found multiple items in result in Globalmethods class correctCommad function with result = {} and searchString = {}".format(result , i) , "i")
+
+                
+                # if the result contains length difference of more than 2 then it means program may as huge difference in command entered and corrected command which may not be exact command
+                # so to prevent running of command not usaully entered we skip this correctness
+                elif(not(abs(len(result[0]) - len(i)) <= 2)):
+                    newCommand = newCommand + i + " "
+                    GlobalData_main.objClogger.log("adv search result items differ from i way to much in Globalmethods class correctCommad function with result = {} and searchString = {}".format(result , i) , "i")
+
+
+                # else we correct this command
+                else:
+                    newCommand = newCommand + str(result[0]) + " "
+                    GlobalData_main.objClogger.log("adv search successfully replaced the mispelled command in Globalmethods class correctCommad function with result = {} and searchString = {}".format(result , i) , "i")
+
+
+            return newCommand
+        except Exception as e:
+            GlobalData_main.objClogger.exception(str(e) , "Exception in Globalmethods class correctCommad function with command = {}".format(command))
+            return command
+
+
+
     # method for comparing if a string as a certain substring
     @classmethod
     def isSubString(cls , string , subString):
@@ -390,6 +475,9 @@ class GlobalMethods:
             normal substring check - string(hello world , this is jarvis) , subString(this jarvis) -> False
             using list substring check - string(hello world , this is jarvis) , subString(this jarvis) -> True
             compares the invidual words as substring"""
+
+        string = str(string)
+        subString = str(subString)
 
         # converting them to same case
         string = string.upper()
@@ -453,8 +541,13 @@ if __name__ == "__main__":
     # setting up the api
     setApis()
 
+    tempList = []
+    # converting search dict keys to list
+    for i,j in GlobalData_main.searchDict.items():
+        tempList.append(i) 
+
     # setting up values in auto completer
-    GlobalData_main.autoCompleteReference = WordCompleter(['weather' , 'update' , 'jarvis' , 'speed' , 'test' , 'setting' , 'restore' , 'open' , 'password' , 'set' , 'file' , 'port' , 'stop' , 'start' , 'show' , 'upload' , 'log' , 'troubleshoot' , 'exit' , 'all'], ignore_case=True)
+    GlobalData_main.autoCompleteReference = WordCompleter(tempList, ignore_case=True)
 
 
 
@@ -936,6 +1029,9 @@ class TroubleShooter:
 
 # main driver function for executing commands
 def driver(command):
+
+    # correcting the command - slighty mispelled commands will be corrected to correct command
+    command = GlobalMethods.correctCommand(command)
 
     """No print is used before main to keep the functions modular , just return the result to main in list form or yield form"""
     

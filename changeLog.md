@@ -13,6 +13,12 @@
 
 7. added update jarvis command
 
+8. auto complete command feature
+
+9. jarvis remembers previously runned command outside inner modules
+
+10. now jarvis can also understand mispelled commands
+
 
 # v0.1
 
