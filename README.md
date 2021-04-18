@@ -109,7 +109,7 @@ You can combine the commands
 </br>
 </br>
 
-# Settings
+### 3. Settings
 ```
 open setting
 ```
@@ -137,7 +137,7 @@ Default settings file looks like - https://github.com/harshnative/Jarvis2.O/blob
 </br>
 
 
-# File Share
+### 4. File Share
 ```
 start file share
 ```
@@ -180,7 +180,7 @@ Show the output created by file share again to see the exact intructions to conn
 
 
 
-# Password Manager
+### 5. Password Manager
 ```
 password
 ```
@@ -192,10 +192,9 @@ For the first time you will need to set the password for encryption.
 
 password should be strong enough containing mixture of characters and min 8 chars in length.
 
-You can also set a custom path to database in settings file.
+You can also set a custom path to database in settings file (path should also contain the name of db like /user/mypasswords.db)
+
 </br>
-
-
 ```
 -a
 ```
@@ -242,9 +241,32 @@ To see all password
 To change password 
 </br>
 
+
+
+```
+-sa all
+```
+Jarvis has started to crush the long references and passwords while showing them in -sa to maintian a cleaner look
+
+To see all the characters in reference and passwords you can add all to the command
+
+like 
+-sa all
+-u all 
+-d all
+</br>
+
 </br>
 </br>
 </br>
+
+
+# Some backend details
+
+1. Storage directory : On windows jarvis stores user file such as logs , settings , data bases etc in C:\programData\JarvisData. While in ubuntu it stores in /opt/JarvisData.
+
+2. Encryption used in password Data base - Jarvis uses military class encryption technique provided by easySED module to securely store your passwords. you learn more about easySED at https://www.letscodeofficial.com/pySEDDocs
+
 
 # license
 Jarvis is licensed under GNU GENERAL PUBLIC LICENSE VERSION 3

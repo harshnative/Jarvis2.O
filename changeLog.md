@@ -19,6 +19,12 @@
 
 10. now jarvis can also understand mispelled commands
 
+11. password module now as skip option in update command as well
+
+12. password module now as delete all option as well
+
+13. improved interaction with password module
+
 
 # v0.1
 

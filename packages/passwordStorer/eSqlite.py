@@ -300,7 +300,7 @@ class SQLiteConnect:
 
     
     # print data of a particular key
-    def printDataOfKey(self, key , errorMessage = "key could not be found" , tableName = None):
+    def printDataOfKey(self, key , errorMessage = "key could not be found" , tableName = None , raiseExcetion = True):
 
         tableName = self.getOperableTableName(tableName)
 
@@ -368,9 +368,8 @@ class SQLiteConnect:
 
         if(found):
             print(tabulate(table, headers=colList , tablefmt="fancy_grid"))
-        else:
-            print(errorMessage)
-
+        elif(raiseExcetion):
+            raise RuntimeError(str(errorMessage))
 
     
     # print entire data in a table
@@ -579,7 +578,7 @@ class SQLiteConnect:
         
             table.append(tempTable)
 
-        if(len(table) > 0):
+        if(len(table) > 1):
             return table
         else:
             return None
@@ -717,7 +716,6 @@ class SQLiteConnect:
         if(commit):
             self.connObj.commit()
 
-    
     # function to add a col to data base
     def addColToTable(self , colName , dataType = "TEXT" , NULL = False , tableName = None , commit = True):
 

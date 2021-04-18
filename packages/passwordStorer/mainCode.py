@@ -258,9 +258,12 @@ class PasswordStorerClass:
     # function to display all data in db
     def displayAll(self , all=False):
         if(all):
-            self.dbObj.printData()
+            self.dbObj.printData(errorMessage="no password added yet , use -a to add password")
         else:
             data = self.dbObj.returnData()
+            if(data == None):
+                print("no password added yet , use -a to add password")
+                return
             indexList = []
             dataList = []
             for i in data[1:]:
@@ -284,12 +287,14 @@ class PasswordStorerClass:
             self.customClearScreen()
 
             # input the data in data col and data in pass col 
+            print("Just press enter to skip adding process\n\n")
             data = input("Enter the website name for reference : ")
             password = input("Enter the password : ")
 
             # if the user by mistake enter the command then pressing enter enter in above input will not lead to insertion in db
             if((data == "") or (password == "")):
-                input("\nAdding process cancelled by user , press enter to continue")
+                print("\nreference or password cannot be empty")
+                input("\nAdding process cancelled , press enter to continue")
                 return
 
 
@@ -349,7 +354,17 @@ class PasswordStorerClass:
 
         # if -u or update command is passed
         elif((GlobalMethods.isSubStringsList(command , "-u")) or (GlobalMethods.isSubStringsList(command , "update"))):
+            
             self.customClearScreen()
+
+
+            # get the data from the db
+            returnedData = self.dbObj.returnData()
+
+            if(returnedData == None):
+                self.customClearScreen()
+                input("No Data found , press enter to continue")
+                return
 
             if(GlobalMethods.isSubStringsList(command , "all")):
                 self.displayAll(True)
@@ -360,9 +375,16 @@ class PasswordStorerClass:
 
             # ask for the index no to update from list show by the above display all function
             try:
-                key = int(input("\nEnter the index to update : "))
+                key = input("\nEnter the index to update or Enter to skip : ")
+
+                if(key == ""):
+                    input("\nUpdation process cancelled , press enter to continue")
+                    return
+                
+                key = int(key)
+
             except Exception:
-                print("\nplease enter valid index no")
+                input("\nplease enter valid index no , press enter to continue")
                 return
 
 
@@ -372,12 +394,16 @@ class PasswordStorerClass:
             try:
                 self.dbObj.printDataOfKey(key)
             except Exception:
-                print("\nplease enter valid index no")
+                input("\nplease enter valid index no , press enter to continue")
                 return
 
 
             # get new pass from user and update into db using eSqlite module
-            newPass = input("\nEnter new password for above website : ")
+            newPass = input("\nEnter new password for above website or just press Enter to skip : ")
+
+            if(newPass == ""):
+                input("\nUpdation process cancelled , press enter to continue")
+                return
 
             self.dbObj.updateRow("pass" , newPass , key)
 
@@ -390,6 +416,14 @@ class PasswordStorerClass:
         # if the delete command or -d is passed
         elif((GlobalMethods.isSubStringsList(command , "-d")) or (GlobalMethods.isSubStringsList(command , "delete"))):
 
+            # get the data from the db
+            returnedData = self.dbObj.returnData()
+
+            if(returnedData == None):
+                self.customClearScreen()
+                input("No Data found , press enter to continue")
+                return
+
             if(GlobalMethods.isSubStringsList(command , "all")):
                 self.displayAll(True)
             else:
@@ -400,17 +434,53 @@ class PasswordStorerClass:
 
             # ask for the index number to delete
             try:
-                key = int(input("\nEnter the index to delete : "))
+                print("\n\nEnter -1 to delete all\n")
+                key = input("\nEnter the index to delete or Enter to skip : ")
+
+                if(key == ""):
+                    input("\nDeletion process cancelled , press enter to continue")
+                    return
+
+                key = int(key)
+                
+
             except Exception:
-                print("\n please enter valid index no")
+                input("\nplease enter valid index no , press enter to continue")
                 return
 
             self.customClearScreen()
 
+            if(key == -1):
+                print("All of your references and passwords are going to be deleted and cannot be retrived")
+                toDeleteAll = input("\nType continue to continue or anything else to skip : ")
+                if(toDeleteAll.lower().strip() == "continue"):
+                    self.customClearScreen()
+                    print("deleting all , please wait ...")
+                    data = self.dbObj.returnData()
+
+                    if(data == None):
+                        print("\n\nno password added yet , use -a to add password")
+                        input("\nPress enter to continue ...")
+                        return
+
+
+                    for i in data[1:]:
+                        self.dbObj.deleteRow(int(i[0]) , updateId=True)
+
+
+                    input("\n\nall passwords deleted successfully , press enter to continue")
+                    return
+
+                else:
+                    input("\nDeletion process cancelled , press enter to continue")
+                    return
+
+
+
             try:
                 self.dbObj.printDataOfKey(key)
             except Exception:
-                print("\nplease enter valid index no")
+                input("\nplease enter valid index no , press enter to continue")
                 return
 
 
@@ -441,6 +511,11 @@ class PasswordStorerClass:
 
             # get the data from the db
             returnedData = self.dbObj.returnData()
+
+            if(returnedData == None):
+                self.customClearScreen()
+                input("No match found , press enter to continue")
+                return
 
             printList = []
 
