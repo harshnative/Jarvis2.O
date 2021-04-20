@@ -933,33 +933,37 @@ class TroubleShooter:
         resetTempInput()
 
         if(not(continueORnot.lower().strip() == "yes")):
-            yield "\n\nTrouble shoot ended..."
+            yield "\n\nTrouble shoot aborted..."
             return
 
-        # resetting the troubleshooter with INFO LEVEL logging
-        GlobalData_main.troubleshootValue = True
-        resetLoggerObj()
+        # we need to make user re run the command when the troubleshoot value was not enabled by default
+        # else we just need to upload the log file
+        if(not(GlobalData_main.troubleshootValue)):
 
-        # telling user to run the command again which caused the error
-        yield "clear screen"
-        yield "\n\nCan you please run the command again which caused error :)\n"
+            # resetting the troubleshooter with INFO LEVEL logging
+            GlobalData_main.troubleshootValue = True
+            resetLoggerObj()
 
-        resetTempInput()
-        GlobalData_main.tempInputToShow = "Enter Command : "
-        yield "#take input#"
-        command = GlobalData_main.tempInput
-        resetTempInput()
+            # telling user to run the command again which caused the error
+            yield "clear screen"
+            yield "\n\nCan you please run the command again which caused error :)\n"
 
-        yield "clear screen"
+            resetTempInput()
+            GlobalData_main.tempInputToShow = "Enter Command : "
+            yield "#take input#"
+            command = GlobalData_main.tempInput
+            resetTempInput()
 
-        # priting the result from driver function
-        for i in GlobalData_main.driverFuncReference(command):
-            yield i
+            yield "clear screen"
 
-        resetTempInput()
-        GlobalData_main.tempInputToShow = "\n\nPress enter to upload log : "
-        yield "#take input#"
-        resetTempInput()
+            # priting the result from driver function
+            for i in GlobalData_main.driverFuncReference(command):
+                yield i
+
+            resetTempInput()
+            GlobalData_main.tempInputToShow = "\n\nPress enter to upload log : "
+            yield "#take input#"
+            resetTempInput()
 
         yield "\n\nUploading log file to server please wait ..."
 
@@ -1537,10 +1541,6 @@ if __name__ == "__main__":
     GlobalData_main.runLoadingAnimation = False
     GlobalData_main.lAnimationObj.join()
 
-    # A message will be printed if the troubleshoot value is True by default
-    if(GlobalData_main.troubleshootValue):
-        print("\nIn dev Mode \n")
-        time.sleep(0.5)
     
     # check for the LC api key and print a message if not setted up
     if((GlobalData_main.lcApiKey == None) or (GlobalData_main.lcApiKey == "")):
@@ -1577,9 +1577,22 @@ if __name__ == "__main__":
     # once the thread finishes and lastest new version is found then toUpgrade handler will be set to True in global data class which will be picked by the if statement in main function
     versionCheckerObj = versionChecker()
     versionCheckerObj.start()
-    
+
+    # checking if the user wants to participate in the user experience program
+    accept = GlobalData_main.settingDict.get("username" , "False")
+    if((accept.lower() == "true") and (not(GlobalData_main.troubleshootValue))):
+        GlobalData_main.troubleshootValue = True
+        resetLoggerObj()
+
     # creating a driver function reference to be used by troubleshoot class
     GlobalData_main.driverFuncReference = driver
 
+
+    # A message will be printed if the troubleshoot value is True by default
+    if(GlobalData_main.troubleshootValue):
+        print("\nIn UEP Mode \n")
+        time.sleep(0.5)
+
     # main will be called
     main()
+

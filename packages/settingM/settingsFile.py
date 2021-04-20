@@ -53,7 +53,7 @@ class SettingsClass:
 
         # default settings file data
         settingsFile = """
-# username - comes instead of sir in greeting line - welcome { username }
+# username - comes instead of default username in greeting line - welcome { username }
 username : None
 
 
@@ -63,6 +63,9 @@ cityName : None
 
 # path for password database
 pathForPassDB : None 
+
+# Want to participate in the user experience program
+acceptUserExperienceProgram : False
         """
 
         # writing the file
