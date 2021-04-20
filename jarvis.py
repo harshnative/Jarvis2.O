@@ -320,6 +320,7 @@ from easyOpenWeather import module as owm
 from tabulate import tabulate
 import requests
 import webbrowser
+import hjson
 import datetime
 
 # for auto completion
@@ -1235,7 +1236,7 @@ def driver(command):
     if(GlobalMethods.isSubStringsList(command , "password")):
 
         # getting the path from settings dict
-        customPath = GlobalData_main.settingDict.get("pathForPassDB")
+        customPath = GlobalData_main.settingDict.get("path_for_password_db")
 
 
         # if path is not setted then simply create new db
@@ -1487,7 +1488,7 @@ def main():
     while(True):
         customClearScreen()
 
-        userName = GlobalData_main.settingDict.get("username" , "None")
+        userName = GlobalData_main.settingDict.get("userName" , "None")
 
         if(userName == "None"):
             userName = getpass.getuser()
@@ -1579,12 +1580,37 @@ if __name__ == "__main__":
     versionCheckerObj.start()
 
     # getting the dict from the settings file
-    resultFromDict = GlobalData_main.settingDict.get("acceptUserExperienceProgram" , "False")
+    resultFromDict = GlobalData_main.settingDict.get("accept_user_experience_program" , "False")
+
+
+    # promt user to participate in the user experience program
+    if(resultFromDict.lower() == "none"):
+        customClearScreen()
+        print("Want to participate in user experience program ?")
+        print("It will help in resolving errors later.")
+        print("logger object will log at info level but no sensitive information is ever logged")
+        inputtedValue = input("\nEnter 1 to accept , anything else to reject : ")
+        if(inputtedValue == "1"):
+            GlobalData_main.settingDict["accept_user_experience_program"] = "True"
+        else:
+            GlobalData_main.settingDict["accept_user_experience_program"] = "False"
+
+        settingsPath = Settings.settingObj.path
+        with open(settingsPath , "w+") as file:
+            file.write(hjson.dumps(GlobalData_main.settingDict))
+
+
 
     # checking if the user agree to the user expreince program
     if((resultFromDict.lower() == "true") and (not(GlobalData_main.troubleshootValue))):
         GlobalData_main.troubleshootValue = True
         resetLoggerObj()
+
+    # if the script is runned
+    elif(GlobalData_main.troubleshootValue):
+        print("\nIn Dev Mode \n")
+        time.sleep(0.5)
+
 
     # creating a driver function reference to be used by troubleshoot class
     GlobalData_main.driverFuncReference = driver

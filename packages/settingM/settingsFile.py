@@ -1,7 +1,8 @@
-from .txtJson import TxtJson
+# from .txtJson import TxtJson
 import time
 import subprocess
 import os
+import hjson
 
 # main class
 class SettingsClass:
@@ -29,7 +30,11 @@ class SettingsClass:
     def getDict(self):
 
         try:
-            dictReturned = TxtJson.getDict(self.path)
+
+            with open(self.path , "r") as file:
+                data = file.read()
+
+            dictReturned = hjson.loads(data)
             return dictReturned
 
         # if the settings file is not present
@@ -42,7 +47,10 @@ class SettingsClass:
             time.sleep(0.5)
 
             # then we will return dict
-            dictReturned = TxtJson.getDict(self.path)
+            with open(self.path , "r") as file:
+                data = file.read()
+
+            dictReturned = hjson.loads(data)
             return dictReturned
 
 
@@ -52,25 +60,16 @@ class SettingsClass:
 
 
         # default settings file data
-        settingsFile = """
-# username - comes instead of default username in greeting line - welcome { username }
-username : None
-
-
-# deafult city name for weather data
-cityName : None
-
-
-# path for password database
-pathForPassDB : None 
-
-# Want to participate in the user experience program (True / False)
-acceptUserExperienceProgram : False
-        """
-
+        settingsFile = {
+  "userName": "None" , 
+  "cityName": "None" , 
+  "path_for_password_db": "None" , 
+  "accept_user_experience_program": "None" , 
+}
+       
         # writing the file
         with open(self.path , "w+") as file:
-            file.write(settingsFile)
+            file.write(hjson.dumps(settingsFile))
 
         
     # function to open the settings using default opener

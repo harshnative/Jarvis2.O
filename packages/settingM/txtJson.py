@@ -95,3 +95,4 @@ if __name__ == "__main__":
     TxtJson.writeDict(x , "hello.txt" , True)
     print(TxtJson.getDict("hello.txt"))
 
+    
