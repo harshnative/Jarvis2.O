@@ -22,8 +22,23 @@ visit https://www.letscodeofficial.com/jarvis_downloads
 </br>
 </br>
 
+# Updating 
+You can update jarvis by either running this command inside jarvis
+
+```
+update jarvis
+```
+
+OR just downloading and installing the latest version
+
+</br>
+</br>
+</br>
+
 # Improvement to previous Gen Jarvis
 link to previous gen jarvis - https://github.com/harshnative/JARVIS
+
+from development point of view - 
 
 1. Designed with modularity in mind that is all the internal function and packages returnes data to main function instead of priting is write away making them reusable anywere
 
@@ -32,6 +47,8 @@ link to previous gen jarvis - https://github.com/harshnative/JARVIS
 3. better caching and optimising in internal function
 
 4. easily scalable
+
+5. many more features
 
 
 </br>
@@ -44,8 +61,13 @@ link to previous gen jarvis - https://github.com/harshnative/JARVIS
 Jarvis 2.O can do many things such as
 
 1. weather of any city
-2. speed test
-3. own settings file
+1. speed test
+1. own settings file
+1. password manager with military class encryption
+1. Share file via both HTTP and FTP server with both wired and wireless medium.
+1. mispelled command detection
+1. auto complete command using tab
+1. in built troubleshooter
 
 
 More comming soon (^_^)
@@ -56,9 +78,42 @@ More comming soon (^_^)
 </br>
 </br>
 
-# Documentation
 
-### 1. Weather
+# OS suppport
+Jarvis is currently desinged , tested and maintained for linux and windows only.
+
+But project itself is made in python as has many other supported platform, making some changes the code should be able to make jarvis run on any operating system.
+
+</br>
+</br>
+</br>
+</br>
+
+
+# Documentation
+<a href="#Weather">1. Weather</a>
+</br>
+<a href="#Speed-Test">2. Speed Test</a>
+</br>
+<a href="#Settings">3. Settings</a>
+</br>
+<a href="#File-Share">4. File Share</a>
+</br>
+<a href="#Password-Manager">5. Password Manager</a>
+</br>
+<a href="#Auto-Completion">6. Auto Completion</a>
+</br>
+
+
+</br>
+</br>
+</br>
+</br>
+
+
+<h2 id="Weather">
+1. Weather
+</h2>
 
 ```
 weather cityName
@@ -74,8 +129,14 @@ you can set the default city name in settings file.
 
 </br>
 </br>
+</br>
+</br>
 
-### 2. Speed Test
+
+<h2 id="Speed-Test">
+2. Speed Test
+</h2>
+
 ```
 speed test
 ```
@@ -83,12 +144,14 @@ speed test
 Will perform the speed test and average it 2 times by default to show you the most accurate real world result
 
 </br>
+</br>
 
 ```
 speed test -b
 ```
 If you want the result in mega bytes instead of mega bits
 
+</br>
 </br>
 
 ```
@@ -99,6 +162,7 @@ If you want the result to be averaged 3 times instead of 2
 averaging is limited to max 5 times
 
 </br>
+</br>
 
 ```
 speed test -b 3
@@ -108,13 +172,20 @@ You can combine the commands
 
 </br>
 </br>
+</br>
+</br>
 
-### 3. Settings
+
+<h2 id="Settings">
+3. Settings
+</h2>
+
 ```
 open setting
 ```
 To open the settings file
 
+</br>
 </br>
 
 ```
@@ -124,6 +195,7 @@ To apply the newly updates settings in Jarvis
 
 
 </br>
+</br>
 
 ```
 restore setting
@@ -131,19 +203,27 @@ restore setting
 To restore the settings file to default value 
 
 </br>
+</br>
 Default settings file looks like - https://github.com/harshnative/Jarvis2.O/blob/main/defaultSettings.txt
 
 </br>
 </br>
+</br>
+</br>
 
 
-### 4. File Share
+
+<h2 id="File-Share">
+4. File Share
+</h2>
+
 ```
 start file share
 ```
 To start a ftp server
 A window will be prompted to select the location to share
 
+</br>
 </br>
 
 ```
@@ -153,12 +233,14 @@ To start a http server
 If you cannot access the ftp server
 Remember you can only download files using http server
 </br>
+</br>
 
 
 ```
 stop file share
 ```
 To stop file share
+</br>
 </br>
 
 
@@ -169,6 +251,7 @@ To set custom file share port if the default file share port is busy in your mac
 
 were PORTNUMBER can be from 1000 to 9999
 </br>
+</br>
 
 
 ```
@@ -177,10 +260,15 @@ show file share
 Show the output created by file share again to see the exact intructions to connect
 </br>
 </br>
+</br>
+</br>
 
 
 
-### 5. Password Manager
+<h2 id="Password-Manager">
+5. Password Manager
+</h2>
+
 ```
 password
 ```
@@ -195,10 +283,12 @@ password should be strong enough containing mixture of characters and min 8 char
 You can also set a custom path to database in settings file (path should also contain the name of db like /user/mypasswords.db)
 
 </br>
+
 ```
 -a
 ```
 To add a password
+</br>
 </br>
 
 
@@ -207,6 +297,7 @@ To add a password
 -u
 ```
 To update a password
+</br>
 </br>
 
 
@@ -217,6 +308,7 @@ To update a password
 ```
 To delete a password
 </br>
+</br>
 
 
 
@@ -224,6 +316,7 @@ To delete a password
 -s
 ```
 To see a password
+</br>
 </br>
 
 
@@ -233,12 +326,14 @@ To see a password
 ```
 To see all password 
 </br>
+</br>
 
 
 ```
 -c
 ```
 To change password 
+</br>
 </br>
 
 
@@ -261,12 +356,37 @@ like
 </br>
 
 
+<h2 id="Auto-Completion">
+6. Auto-Completion
+</h2>
+
+After writing some part of the command you can press tab to auto complete it
+
+Auto completion does not work when entering variables.
+
+
+
+
+</br>
+
+</br>
+</br>
+</br>
+
+
+
 # Some backend details
 
 1. Storage directory : On windows jarvis stores user file such as logs , settings , data bases etc in C:\programData\JarvisData. While in ubuntu it stores in /opt/JarvisData.
 
 2. Encryption used in password Data base - Jarvis uses military class encryption technique provided by easySED module to securely store your passwords. you learn more about easySED at https://www.letscodeofficial.com/pySEDDocs
 
+
+</br>
+
+</br>
+</br>
+</br>
 
 # license
 Jarvis is licensed under GNU GENERAL PUBLIC LICENSE VERSION 3
