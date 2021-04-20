@@ -25,6 +25,8 @@
 
 13. improved interaction with password module
 
+14. user can participate in the user experience program
+
 
 # v0.1
 

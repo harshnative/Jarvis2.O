@@ -64,7 +64,7 @@ cityName : None
 # path for password database
 pathForPassDB : None 
 
-# Want to participate in the user experience program
+# Want to participate in the user experience program (True / False)
 acceptUserExperienceProgram : False
         """
 

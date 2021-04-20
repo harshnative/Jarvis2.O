@@ -1578,9 +1578,11 @@ if __name__ == "__main__":
     versionCheckerObj = versionChecker()
     versionCheckerObj.start()
 
-    # checking if the user wants to participate in the user experience program
-    accept = GlobalData_main.settingDict.get("username" , "False")
-    if((accept.lower() == "true") and (not(GlobalData_main.troubleshootValue))):
+    # getting the dict from the settings file
+    resultFromDict = GlobalData_main.settingDict.get("acceptUserExperienceProgram" , "False")
+
+    # checking if the user agree to the user expreince program
+    if((resultFromDict.lower() == "true") and (not(GlobalData_main.troubleshootValue))):
         GlobalData_main.troubleshootValue = True
         resetLoggerObj()
 
