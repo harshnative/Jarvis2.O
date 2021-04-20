@@ -410,10 +410,7 @@ More contributors are listed on website - https://www.letscodeofficial.com/jarvi
 
 
 # Donate 🥰
-You can click on this button to
-<button name="Donate here" onclick="https://www.letscodeofficial.com/jarvis_contribute">Donate</button>
-
-or directly donate at https://www.letscodeofficial.com/jarvis_contribute
+You can donate at https://www.letscodeofficial.com/jarvis_contribute
 
 </br>
 
@@ -423,7 +420,7 @@ or directly donate at https://www.letscodeofficial.com/jarvis_contribute
 
 
 # Contribute
-Comming soon
+Comming soon 
 
 
 </br>
