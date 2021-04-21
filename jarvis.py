@@ -663,11 +663,17 @@ class Settings:
     def returnDict(cls):
         try:
             returnedDict = cls.settingObj.getDict()
+
+            if(len(returnedDict) == 0):
+                cls.restoreSettings()
+                time.sleep(0.5)
+
             GlobalData_main.objClogger.log("settings dict returned successfully in returnDict function in settings class with dict = {}".format(returnedDict) , "i")
+            return returnedDict
+
         except Exception as e:
             GlobalData_main.objClogger.exception(str(e) , "error in settingObj.getDict() function")
-
-        return returnedDict
+            return {}
 
     # method to open the settings file
     # returns True on successfull opening 
