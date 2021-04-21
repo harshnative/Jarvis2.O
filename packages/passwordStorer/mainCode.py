@@ -166,7 +166,8 @@ class PasswordStorerClass:
             # try to re - enter the password till its correct or leave both fields empty to exit it
             while(True):
 
-                    print()
+                    print("you can press enter enter to exit password module\n\n")
+                    
 
                     # input password
                     password = hashPasswordInput('enter password : ')
@@ -180,7 +181,6 @@ class PasswordStorerClass:
                         # if the password and pin is empty then exit the module
                         if((password == "") and (pin == "")):
                             print("\n\nExisting password module")
-                            input("\npress enter to continue...")
                             return
                         
                         pin = int(pin)
@@ -209,7 +209,8 @@ class PasswordStorerClass:
             
             while(True):
                 self.customClearScreen()
-                print()
+                print("you can press enter enter to exit password module\n\n")
+                
                 
                 # input password
                 password = hashPasswordInput('enter new password : ')
@@ -222,7 +223,6 @@ class PasswordStorerClass:
                     # if the password and pin is empty then exit the module
                     if((password == "") and (pin == "")):
                         print("\n\nExisting password module")
-                        input("\npress enter to continue...")
                         return
                     
                     pin = int(pin)
@@ -246,7 +246,6 @@ class PasswordStorerClass:
                     # if the password and pin is empty then exit the module
                     if((password1 == "") and (pin1 == "")):
                         print("\n\nExisting password module")
-                        input("\npress enter to continue...")
                         return
                     
                     pin = int(pin)
@@ -356,10 +355,33 @@ class PasswordStorerClass:
             self.customClearScreen()
 
             # input the data in data col and data in pass col 
-            print("Just press enter to skip adding process\n\n")
+            print("Just press enter to skip adding process")
 
-            data = input("Enter the website name for reference : ")
-            password = input("Enter the password : ")
+
+            # if multi line input option is passed
+            if(GlobalMethods.isSubStringsList(command , "-m")):
+                
+                print("\n\n")
+
+                # inputting reference
+                print("Enter the website name for reference and press ( ctrl d on linux or ctrl z on windows ) on new line to stop entering : ")
+                msg = sys.stdin.readlines()
+                data = ""
+                for i in msg:
+                    data = data + i
+
+                # inputting password
+                print("\n\nEnter the password and press ( ctrl d on linux or ctrl z on windows ) on new line to stop entering : ")
+                msg = sys.stdin.readlines()
+                password = ""
+                for i in msg:
+                    password = password + i
+
+            else:
+                print("If you want to add multiple lines then you need to pass -m as option with -a\n\n")
+
+                data = input("Enter the website name for reference : ")
+                password = input("\nEnter the password : ")
 
             # if the user by mistake enter the command then pressing enter enter in above input will not lead to insertion in db
             if((data == "") or (password == "")):
@@ -689,7 +711,6 @@ class PasswordStorerClass:
                     # if the password and pin is empty then exit the module
                     if((oldPass == "") and (oldPin == "")):
                         print("\n\nExisting password module")
-                        input("\npress enter to continue...")
                         return
                     
                     oldPin = int(oldPin)
@@ -732,7 +753,6 @@ class PasswordStorerClass:
                     # if the password and pin is empty then exit the module
                     if((password == "") and (pin == "")):
                         print("\n\nExisting password module")
-                        input("\npress enter to continue...")
                         return
                     
                     pin = int(pin)
@@ -755,7 +775,6 @@ class PasswordStorerClass:
                     # if the password and pin is empty then exit the module
                     if((password1 == "") and (pin1 == "")):
                         print("\n\nExisting password module")
-                        input("\npress enter to continue...")
                         return
                     
                     pin1 = int(pin1)

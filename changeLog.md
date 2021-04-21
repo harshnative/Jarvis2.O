@@ -27,6 +27,8 @@
 
 14. user can participate in the user experience program
 
+15. user can now add multi line input in password module
+
 
 # v0.1
 

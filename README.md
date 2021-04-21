@@ -292,6 +292,14 @@ To add a password
 </br>
 
 
+```
+-a -m 
+```
+To add a multi line password
+
+You will need to press on a new line - ctrl + d on linux or ctrl + z on windows to stop entering and add it
+</br>
+</br>
 
 ```
 -u
