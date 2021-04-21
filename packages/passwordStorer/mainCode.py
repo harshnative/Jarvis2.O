@@ -163,14 +163,28 @@ class PasswordStorerClass:
         # if password verfiy then set it to eSqlite obj for encryption and decryption
         if(self.dbObj.checkForPasswordTable()):
 
-            # try to re - enter the password till its correct
+            # try to re - enter the password till its correct or leave both fields empty to exit it
             while(True):
+
                     print()
+
+                    # input password
                     password = hashPasswordInput('enter password : ')
                     pin = 0
+
                     try:
-                        pin = int(hashPasswordInput("enter pin : "))
-                    except Exception:
+
+                        # input pin
+                        pin = hashPasswordInput("enter pin : ")
+
+                        # if the password and pin is empty then exit the module
+                        if((password == "") and (pin == "")):
+                            print("\n\nExisting password module")
+                            input("\npress enter to continue...")
+                            return
+                        
+                        pin = int(pin)
+                    except ValueError:
                         print("\n\nPin should only consist of numbers...")
                         input("\npress enter to continue...")
                         self.customClearScreen()
@@ -184,25 +198,40 @@ class PasswordStorerClass:
                             del pin
                             break
                     else:
-                            print("\n wrong password")
+                            print("\nwrong password")
+                            print("\nYou can leave both feilds empty to exit password module")
                             input("\n\nPress Enter to continue")
                             self.customClearScreen()
 
 
-        # else ask for new password and generate a password table in db using eSqlite obj
+        # if data base does not exist ask for new password and generate a password table in db using eSqlite obj
         else:
             
             while(True):
                 self.customClearScreen()
                 print()
+                
+                # input password
                 password = hashPasswordInput('enter new password : ')
                 pin = 0
                 try:
-                    pin = int(hashPasswordInput("enter new pin : "))
-                except Exception:
+
+                    # input pin
+                    pin = hashPasswordInput("enter pin : ")
+
+                    # if the password and pin is empty then exit the module
+                    if((password == "") and (pin == "")):
+                        print("\n\nExisting password module")
+                        input("\npress enter to continue...")
+                        return
+                    
+                    pin = int(pin)
+                except ValueError:
                     print("\n\nPin should only consist of numbers...")
                     input("\npress enter to continue...")
+                    self.customClearScreen()
                     continue
+
 
                 
                 print()
@@ -210,20 +239,39 @@ class PasswordStorerClass:
                 password1 = hashPasswordInput('enter password again : ')
                 pin1 = 0
                 try:
-                    pin1 = int(hashPasswordInput("enter pin again : "))
-                except Exception:
+
+                    # input pin
+                    pin1 = hashPasswordInput("enter pin again : ")
+
+                    # if the password and pin is empty then exit the module
+                    if((password1 == "") and (pin1 == "")):
+                        print("\n\nExisting password module")
+                        input("\npress enter to continue...")
+                        return
+                    
+                    pin = int(pin)
+                except ValueError:
                     print("\n\nPin should only consist of numbers...")
                     input("\npress enter to continue...")
+                    self.customClearScreen()
                     continue
 
+                # if the password does not prompt user
                 if((password != password1) and (pin != pin1)):
                         print("\nPassword and pin does not match")
+                        print("\nTry again ...")
+                        input("\n\nPress enter to continue")
+                        continue
                 else:
                         status = self.dbObj.setPassword(password , pin)
                         if(status == None):
                                 break
                         else:
                                 print("\nsome error occur")
+                                print("existing password module")
+                                print("if error persist try deleting {}".format(self.DataBasePath))
+                                input("\n\nPress enter to continue")
+                                return
 
 
         # create a table with two col data and pass , no exception will be raised if table already exsist
@@ -257,24 +305,45 @@ class PasswordStorerClass:
 
     # function to display all data in db
     def displayAll(self , all=False):
+
+        # if condensing of the long references and passwords is not necessary then we can simply use print function of easySQlite module 
         if(all):
             self.dbObj.printData(errorMessage="no password added yet , use -a to add password")
         else:
+
+            # else if data condensing is necessary to fit data on terminal screen then we use pandas data frame
+
+            # getting the data 
             data = self.dbObj.returnData()
+
+            # if the data is empty prompt
             if(data == None):
                 print("no password added yet , use -a to add password")
                 return
+
+
+            # IDS will be added to index list , while reference and password will be added to data list
             indexList = []
             dataList = []
+
             for i in data[1:]:
                 indexList.append(i[0])
                 dataList.append(i[1:])
 
+            # panda will show all the rows
             pd.set_option("display.max_rows", None)
+
+            # panda will set the col widths according to screen size , their are two cols
             pd.set_option("display.max_colwidth", int((os.get_terminal_size()[0]/2) - 5))
+
+            # setting up the data frame
             dataFrame = pd.DataFrame(dataList , columns=["reference" , "password"] , index=indexList)
             dataFrame.index.name = "ID"
+
+            # showing the data frame
             print(dataFrame)
+
+
 
 
     # function to interpret the command and exceute it
@@ -288,6 +357,7 @@ class PasswordStorerClass:
 
             # input the data in data col and data in pass col 
             print("Just press enter to skip adding process\n\n")
+
             data = input("Enter the website name for reference : ")
             password = input("Enter the password : ")
 
@@ -309,16 +379,20 @@ class PasswordStorerClass:
         elif((GlobalMethods.isSubStringsList(command , "-sa")) or (GlobalMethods.isSubStringsList(command , "see all"))):
             self.customClearScreen()
             
+            # all command is added
             if(GlobalMethods.isSubStringsList(command , "all")):
                 self.displayAll(True)
             else:
                 self.displayAll()
 
+            # take the input of the index number to copy password
             index = input("\n\nEnter index number to copy password or Enter to continue : ")
 
+            # if index number is empty return to Enter command function
             if(index == ""):
                 return
             
+            # convert the index to int , prompt if error
             try:
                 index = int(index)
             except ValueError:
@@ -326,15 +400,20 @@ class PasswordStorerClass:
                 time.sleep(0.9)
                 return
 
+            # get the data corresponding to the index number from data base
             data = self.dbObj.returnDataOfKey(index)
 
+            # if no data is found, prompt user and exit
             if(data == None):
                 print("\n\nWrong index number...")
                 time.sleep(0.9)
                 return
             
+            # paste the password to clipboard
             try:
                 pyperclip.copy(data[0][2])
+            
+            # if pyperclip could not work , prompt user
             except NotImplementedError:
                 print("\n\nJarvis could not find the copy paste mechanism on your machine.")
                 print("This happens with linux users , you will need to install copy paste mechanism")
@@ -361,11 +440,13 @@ class PasswordStorerClass:
             # get the data from the db
             returnedData = self.dbObj.returnData()
 
+            # if the data base as no data prompt user and exit
             if(returnedData == None):
                 self.customClearScreen()
                 input("No Data found , press enter to continue")
                 return
 
+            # else print data according to all command
             if(GlobalMethods.isSubStringsList(command , "all")):
                 self.displayAll(True)
             else:
@@ -383,7 +464,7 @@ class PasswordStorerClass:
                 
                 key = int(key)
 
-            except Exception:
+            except ValueError:
                 input("\nplease enter valid index no , press enter to continue")
                 return
 
@@ -394,6 +475,8 @@ class PasswordStorerClass:
             try:
                 self.dbObj.printDataOfKey(key)
             except Exception:
+
+                # if some error occur , user will be prompted
                 input("\nplease enter valid index no , press enter to continue")
                 return
 
@@ -405,6 +488,7 @@ class PasswordStorerClass:
                 input("\nUpdation process cancelled , press enter to continue")
                 return
 
+            # update the password in table
             self.dbObj.updateRow("pass" , newPass , key)
 
             print("\npassword updated successfully")
@@ -419,11 +503,13 @@ class PasswordStorerClass:
             # get the data from the db
             returnedData = self.dbObj.returnData()
 
+            # if no data is found , prompt user
             if(returnedData == None):
                 self.customClearScreen()
                 input("No Data found , press enter to continue")
                 return
 
+            # else display data according to all command
             if(GlobalMethods.isSubStringsList(command , "all")):
                 self.displayAll(True)
             else:
@@ -444,42 +530,56 @@ class PasswordStorerClass:
                 key = int(key)
                 
 
-            except Exception:
+            except ValueError:
                 input("\nplease enter valid index no , press enter to continue")
                 return
 
             self.customClearScreen()
 
+            # if user wants to delete all passwords
             if(key == -1):
+
+                # conform from user
                 print("All of your references and passwords are going to be deleted and cannot be retrived")
                 toDeleteAll = input("\nType continue to continue or anything else to skip : ")
+                
+                # if the user conforms
                 if(toDeleteAll.lower().strip() == "continue"):
                     self.customClearScreen()
                     print("deleting all , please wait ...")
+
+                    # get data from db
                     data = self.dbObj.returnData()
 
+                    # if their is already no data prompt user
                     if(data == None):
                         print("\n\nno password added yet , use -a to add password")
                         input("\nPress enter to continue ...")
                         return
 
 
+                    # else delete data by IDS
+                    # data[1:] is used because data[0] are col names
+                    # i[0] containes the ID numbers
                     for i in data[1:]:
                         self.dbObj.deleteRow(int(i[0]) , updateId=True)
 
 
+                    # prompting user of process completion
                     input("\n\nall passwords deleted successfully , press enter to continue")
                     return
 
+                # if user disagree , exit
                 else:
                     input("\nDeletion process cancelled , press enter to continue")
                     return
 
 
-
+            # else print data of index no entered by user to conform it
             try:
                 self.dbObj.printDataOfKey(key)
             except Exception:
+                # if error prompt and exit
                 input("\nplease enter valid index no , press enter to continue")
                 return
 
@@ -487,6 +587,7 @@ class PasswordStorerClass:
             # confirm from the user to delete the website
             temp = input("\nabove website is going to be deleted , enter 1 to continue or anything else to skip : ")
 
+            # if user agrees to delete password at index number
             if(temp == "1"):
                 self.dbObj.deleteRow(key , updateId=True)
 
@@ -494,6 +595,7 @@ class PasswordStorerClass:
 
                 input("\npress enter to continue")
 
+            # else exit
             else:
                 print("\noperation cancelled")
 
@@ -512,13 +614,13 @@ class PasswordStorerClass:
             # get the data from the db
             returnedData = self.dbObj.returnData()
 
+            # if data in table , prompt user and exit
             if(returnedData == None):
                 self.customClearScreen()
                 input("No match found , press enter to continue")
                 return
 
             printList = []
-
 
             # search for the data in db and add to list if matches
             for i in returnedData[1:]:
@@ -532,6 +634,8 @@ class PasswordStorerClass:
             # display the areas were the data matches
             self.dbObj.tabulatePrinter(printList , returnedData[0])
 
+
+            # input index number to copy password just like -sa command
             index = input("\n\nEnter index number to copy password or Enter to continue : ")
 
             if(index == ""):
@@ -575,13 +679,25 @@ class PasswordStorerClass:
 
                 # take the old password from user
                 self.customClearScreen()
+                print("you can press enter enter to skip it\n\n")
                 oldPass = hashPasswordInput("Enter old password : ")
                 try:
-                    oldPin = int(hashPasswordInput("Enter old pin : "))
-                except Exception:
-                    print("\nenter valid pin , press enter to continue")
-                    input()
-                    return
+
+                    # input pin
+                    oldPin = hashPasswordInput("enter old pin : ")
+
+                    # if the password and pin is empty then exit the module
+                    if((oldPass == "") and (oldPin == "")):
+                        print("\n\nExisting password module")
+                        input("\npress enter to continue...")
+                        return
+                    
+                    oldPin = int(oldPin)
+                except ValueError:
+                    print("\n\nPin should only consist of numbers...")
+                    input("\npress enter to continue...")
+                    self.customClearScreen()
+                    continue
 
 
                 # check if the password entered is correct using eSqlite module
@@ -602,16 +718,28 @@ class PasswordStorerClass:
             while(True):
 
                 self.customClearScreen()
-                print()
+                print("you can press enter enter to skip it\n\n")
+                
 
                 # ask for new password
                 password = hashPasswordInput('enter new password : ')
                 pin = 0
                 try:
-                    pin = int(hashPasswordInput("enter new pin : "))
-                except Exception:
+
+                    # input pin
+                    pin = hashPasswordInput("enter new pin : ")
+
+                    # if the password and pin is empty then exit the module
+                    if((password == "") and (pin == "")):
+                        print("\n\nExisting password module")
+                        input("\npress enter to continue...")
+                        return
+                    
+                    pin = int(pin)
+                except ValueError:
                     print("\n\nPin should only consist of numbers...")
                     input("\npress enter to continue...")
+                    self.customClearScreen()
                     continue
 
                 
@@ -620,10 +748,21 @@ class PasswordStorerClass:
                 password1 = hashPasswordInput('enter password again : ')
                 pin1 = 0
                 try:
-                    pin1 = int(hashPasswordInput("enter pin again : "))
-                except Exception:
+
+                    # input pin
+                    pin1 = hashPasswordInput("enter pin again : ")
+
+                    # if the password and pin is empty then exit the module
+                    if((password1 == "") and (pin1 == "")):
+                        print("\n\nExisting password module")
+                        input("\npress enter to continue...")
+                        return
+                    
+                    pin1 = int(pin1)
+                except ValueError:
                     print("\n\nPin should only consist of numbers...")
                     input("\npress enter to continue...")
+                    self.customClearScreen()
                     continue
 
                 if((password != password1) and (pin != pin1)):
