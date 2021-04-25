@@ -65,6 +65,9 @@ class SettingsClass:
   "cityName": "None" , 
   "path_for_password_db": "None" , 
   "accept_user_experience_program": "None" , 
+  "userName_fileShare": "None" , 
+  "password_fileShare": "None" , 
+  "defaultFolderFileShare": "None", 
 }
        
         # writing the file

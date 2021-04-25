@@ -92,6 +92,10 @@ class GlobalData_main:
                 'port': {}, 
                 'stop': {}, 
                 'start': {}, 
+                'share': {},
+                '-log': {},
+                '-a': {},
+                'http': {},
                 'show': {}, 
                 'upload': {}, 
                 'log': {}, 
@@ -390,6 +394,16 @@ class GlobalMethods:
     # method for correcting the incorrect spelling
     @classmethod
     def correctCommand(cls , command):
+
+        # function to find the number of 
+        def matchCharInString(string1 , string2):
+            setString1 = set(string1)
+            setString2 = set(string2)
+
+            matchedCharacters = setString1 & setString2
+
+            return len(matchedCharacters)
+
         try:
             command = str(command)
 
@@ -398,6 +412,15 @@ class GlobalMethods:
             newCommand = ""
 
             for i in commandList:
+                i = str(i).strip()
+                if(i[0] == "-"):
+                    newCommand = newCommand + str(i) + " "
+                    continue
+                
+                if(i.isnumeric()):
+                    newCommand = newCommand + str(i) + " "
+                    continue
+
                 result = cls.advSearchObj.search(word=i)
                 
                 try:
@@ -421,8 +444,12 @@ class GlobalMethods:
                 # so to prevent running of command not usaully entered we skip this correctness
                 elif(not(abs(len(result[0]) - len(i)) <= 2)):
                     newCommand = newCommand + i + " "
-                    GlobalData_main.objClogger.log("adv search result items differ from i way to much in Globalmethods class correctCommad function with result = {} and searchString = {}".format(result , i) , "i")
+                    GlobalData_main.objClogger.log("adv search result items differ from i way to much in terms of length in Globalmethods class correctCommad function with result = {} and searchString = {}".format(result , i) , "i")
 
+                # if the number characters in the string differ by lot , then also skip correction
+                elif(not(abs(matchCharInString(result[0] , i) - len(set(i))) <= 2)):
+                    newCommand = newCommand + i + " "
+                    GlobalData_main.objClogger.log("adv search result items differ from i way to much in Globalmethods class correctCommad function with result = {} and searchString = {}".format(result , i) , "i")
 
                 # else we correct this command
                 else:
@@ -754,9 +781,14 @@ class FileShareClass:
     # open the tk gui window and then stores the returned path in class var
     # return False if process fails else return True
     @classmethod
-    def setSharePath(cls):
+    def setSharePath(cls , path = None):
         try:
-            folder_selected = filedialog.askdirectory()
+
+            if(path != None):
+                if(os.path.exists(str(path)) == True):
+                    folder_selected = path
+            else:
+                folder_selected = filedialog.askdirectory()
             GlobalData_main.objClogger.log("file share path setted successfully" , "i")
         except Exception as e:
             GlobalData_main.objClogger.exception(str(e) , "Exception in getting folder path from tkinter window")
@@ -772,18 +804,44 @@ class FileShareClass:
     # returns None in case of process failure
     # else returns a list of output from module
     @classmethod
-    def startFileShare(cls , http = False):
+    def startFileShare(cls , http = False , anomus = False , logToConsole = False):
+        GlobalData_main.dataListFileShare.clear()
+
         try:
-            result = cls.fil.start_fileShare(cls.path , http=http , port=GlobalData_main.portForFileShare)
-            GlobalData_main.dataListFileShare = result
-            GlobalData_main.addressForShare = cls.fil.get_ip_address()
-            GlobalData_main.printDataList.append("File Share active at {}:{}".format(str(GlobalData_main.addressForShare) , str(GlobalData_main.portForFileShare)))
-            GlobalData_main.objClogger.log("file share server started at {}".format(str(cls.path)) , "i")
-            GlobalData_main.isFileShareStarted = True
-            return result
+            userName = GlobalData_main.settingDict.get("userName_fileShare" , "None")
+            if(str(userName).lower() == "none"):
+                userName = "user"
+            
+            userPass = GlobalData_main.settingDict.get("password_fileShare" , "None")
+            if(str(userPass).lower() == "none"):
+                userPass = "147896"
+
+            if(not(logToConsole)):
+                for i in cls.fil.start_fileShare(cls.path , http=http , port=GlobalData_main.portForFileShare , useOtherPort=True , userNameFTP=userName , userPasswordFTP=userPass , FTPanomusAccess=anomus , logToConsole=False):
+                    if(i != None):
+                        GlobalData_main.dataListFileShare.append(i)
+
+                GlobalData_main.addressForShare = cls.fil.get_ip_address()
+                GlobalData_main.printDataList.append("File Share active at {}:{}".format(str(GlobalData_main.addressForShare) , str(cls.fil.getPort())))
+                GlobalData_main.objClogger.log("file share server started at {}".format(str(cls.path)) , "i")
+                GlobalData_main.isFileShareStarted = True
+                return GlobalData_main.dataListFileShare
+            
+            else:
+                customClearScreen()
+
+                for i in cls.fil.start_fileShare(cls.path , http=http , port=GlobalData_main.portForFileShare , useOtherPort=True , userNameFTP=userName , userPasswordFTP=userPass , FTPanomusAccess=anomus , logToConsole=True):
+                    if(i != None):
+                        print(i)
+                        print()
+
+                               
+
         except Exception as e:
             GlobalData_main.objClogger.exception(str(e) , "Exception in starting the file share server at {}".format(str(cls.path)))
             return None
+        
+        return ["file sharing stopped"] 
 
     
     # function to stop the file share module
@@ -838,7 +896,7 @@ class FileShareClass:
 
 
 
-class versionChecker(Thread):
+class VersionChecker(Thread):
 
     def run(self):
         try:
@@ -857,6 +915,8 @@ class versionChecker(Thread):
                 GlobalData_main.toUpgradeJarvis = True
 
             GlobalData_main.objClogger.log("jarvis new version thread runned succesfully with version from response = {} and current version = {}".format(str(versionFromResponse) , str(currentVersion)) , "i")
+
+            return versionFromResponse
 
         except Exception as e:
                 GlobalData_main.objClogger.exception(str(e) , "Exception in get version thread")
@@ -1344,18 +1404,34 @@ def driver(command):
     # if the start file share command is passed
     if(GlobalMethods.isSubStringsList(command , "start file")):
 
-        status = FileShareClass.setSharePath()
+        path = None
+
+        if(GlobalMethods.isSubStringsList(command , "-d")):
+            path = GlobalData_main.settingDict.get("defaultFolderFileShare" , "None")
+            if(str(path).lower() == "none"):
+                path = None
+
+
+        status = FileShareClass.setSharePath(path=path)
 
         if(not(status)):
             yield "fileShare module could not get path, Try again"
             return True
 
         http = False
+        logToConsole = False
+        anomus = False
 
         if(GlobalMethods.isSubStringsList(command , "http")):
             http = True
+        
+        if(GlobalMethods.isSubStringsList(command , "-log")):
+            logToConsole = True
+        
+        if(GlobalMethods.isSubStringsList(command , "-a")):
+            anomus = True
 
-        result = FileShareClass.startFileShare(http=http)
+        result = FileShareClass.startFileShare(http=http , logToConsole=logToConsole , anomus=anomus)
 
         if(result == None):
             yield "fileShare module could not start the server, Try try restarting the jarvis"
@@ -1582,7 +1658,7 @@ if __name__ == "__main__":
 
     # starting the version checker thread
     # once the thread finishes and lastest new version is found then toUpgrade handler will be set to True in global data class which will be picked by the if statement in main function
-    versionCheckerObj = versionChecker()
+    versionCheckerObj = VersionChecker()
     versionCheckerObj.start()
 
     # getting the dict from the settings file
@@ -1629,4 +1705,5 @@ if __name__ == "__main__":
 
     # main will be called
     main()
+
 
