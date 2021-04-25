@@ -337,7 +337,7 @@ from prompt_toolkit.lexers import PygmentsLexer
 
 
 # for adv search 
-from fast_autocomplete import AutoComplete
+from packages.fast_autocomplete import AutoComplete
 
 
 # self made modules
@@ -504,7 +504,6 @@ class GlobalMethods:
                         pass
 
             # logging the result for debugging purpose
-            GlobalData_main.objClogger.log("subString not found in GlobalMethod class isSubString function , values(string , subString) = ({} , {})".format(string , subString) , "i")
             return False
 
         except Exception as e:
