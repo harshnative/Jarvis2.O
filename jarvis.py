@@ -95,6 +95,7 @@ class GlobalData_main:
                 'share': {},
                 '-log': {},
                 '-a': {},
+                '-d': {},
                 'http': {},
                 'show': {}, 
                 'upload': {}, 
@@ -244,7 +245,8 @@ def customClearScreen():
 
 
 
-
+# function to reset the logger obj
+# necessary when the troubleshoot value is changed
 def resetLoggerObj():
     # setting up the logger module
     try:
@@ -256,6 +258,7 @@ def resetLoggerObj():
     GlobalData_main.objClogger.setTroubleShoot(GlobalData_main.troubleshootValue)
 
 
+# setting up logger obj for first time
 if __name__ == "__main__":
     resetLoggerObj()
 
@@ -337,6 +340,7 @@ from prompt_toolkit.lexers import PygmentsLexer
 from fast_autocomplete import AutoComplete
 
 
+# self made modules
 from packages.speedTest import speedTestFile
 from packages.settingM import settingsFile
 from packages.settingM import txtJson
@@ -350,6 +354,7 @@ from packages.fileShare import FS
 from tkinter import filedialog
 from tkinter import *
 
+# init tkinter
 if __name__ == "__main__":
     GlobalData_main.root = Tk()
     GlobalData_main.root.withdraw()
@@ -395,7 +400,7 @@ class GlobalMethods:
     @classmethod
     def correctCommand(cls , command):
 
-        # function to find the number of 
+        # function to find the number of matched characters in two strings
         def matchCharInString(string1 , string2):
             setString1 = set(string1)
             setString2 = set(string2)
@@ -404,25 +409,36 @@ class GlobalMethods:
 
             return len(matchedCharacters)
 
+
         try:
+
+            # making the command list
             command = str(command)
 
             commandList = command.split()
 
             newCommand = ""
 
+            # traversing the command list
             for i in commandList:
                 i = str(i).strip()
+
+                # if i starts with - then skip the auto correction function
+                # and directly add i to new command
                 if(i[0] == "-"):
                     newCommand = newCommand + str(i) + " "
                     continue
                 
+                # if i is number then skip the auto correction function
                 if(i.isnumeric()):
                     newCommand = newCommand + str(i) + " "
                     continue
 
+
+                # search list from the adv search object
                 result = cls.advSearchObj.search(word=i)
                 
+                # if no result was returned then skip auto correctness
                 try:
                     result = result[0]
                     GlobalData_main.objClogger.log("adv search found result[0] in result in Globalmethods class correctCommad function with result = {} and searchString = {}".format(result , i) , "i")
@@ -434,6 +450,7 @@ class GlobalMethods:
 
 
                 # if result contains more than 1 string then simply add old command
+                # which means we are not able to determine the exact command
                 # as program can cannot determine the exact command
                 if(len(result) != 1):
                     newCommand = newCommand + i + " "
@@ -441,6 +458,7 @@ class GlobalMethods:
 
                 
                 # if the result contains length difference of more than 2 then it means program may as huge difference in command entered and corrected command which may not be exact command
+                # as returning some other result may lead to execution of command which was not intended
                 # so to prevent running of command not usaully entered we skip this correctness
                 elif(not(abs(len(result[0]) - len(i)) <= 2)):
                     newCommand = newCommand + i + " "
@@ -458,6 +476,8 @@ class GlobalMethods:
 
 
             return newCommand
+
+        # if some error occur simply return the old command
         except Exception as e:
             GlobalData_main.objClogger.exception(str(e) , "Exception in Globalmethods class correctCommad function with command = {}".format(command))
             return command
@@ -559,7 +579,7 @@ class GlobalMethods:
 
 
 
-
+# function to set the apis from the local storage to keep them safe
 def setApis():
     GlobalData_main.lcApiKey = apiStorer.StorageClass.letsCodeApi
     GlobalData_main.openWeatherApiKey = apiStorer.StorageClass.openWeatherApi
@@ -691,6 +711,7 @@ class Settings:
         try:
             returnedDict = cls.settingObj.getDict()
 
+            # if the retruned dict length is zero then restore the settings file
             if(len(returnedDict) == 0):
                 cls.restoreSettings()
                 time.sleep(0.5)
@@ -774,21 +795,31 @@ class FileShareClass:
 
     # some class vars
     fil = FS.FileShareClass()
+
+    # path to the folder to share
     path = None 
 
     
     # function to set the share path for the file share
+    # if the path passed is None or incorrect then 
     # open the tk gui window and then stores the returned path in class var
     # return False if process fails else return True
     @classmethod
     def setSharePath(cls , path = None):
         try:
 
+            # check the path passed if it is not None
             if(path != None):
                 if(os.path.exists(str(path)) == True):
                     folder_selected = path
+
+                # if the path is incorrect simply open the gui window
+                else:
+                    folder_selected = filedialog.askdirectory()
+            
             else:
                 folder_selected = filedialog.askdirectory()
+
             GlobalData_main.objClogger.log("file share path setted successfully" , "i")
         except Exception as e:
             GlobalData_main.objClogger.exception(str(e) , "Exception in getting folder path from tkinter window")
@@ -808,6 +839,8 @@ class FileShareClass:
         GlobalData_main.dataListFileShare.clear()
 
         try:
+
+            # getting the user name and password for file share in settings file
             userName = GlobalData_main.settingDict.get("userName_fileShare" , "None")
             if(str(userName).lower() == "none"):
                 userName = "user"
@@ -816,24 +849,33 @@ class FileShareClass:
             if(str(userPass).lower() == "none"):
                 userPass = "147896"
 
+            # if log to console is not active
             if(not(logToConsole)):
+
+                # start the file share with parameters
                 for i in cls.fil.start_fileShare(cls.path , http=http , port=GlobalData_main.portForFileShare , useOtherPort=True , userNameFTP=userName , userPasswordFTP=userPass , FTPanomusAccess=anomus , logToConsole=False):
+                    # add returned data to global data list
                     if(i != None):
                         GlobalData_main.dataListFileShare.append(i)
 
+                # add details to global data for quick message before enter command function 
                 GlobalData_main.addressForShare = cls.fil.get_ip_address()
                 GlobalData_main.printDataList.append("File Share active at {}:{}".format(str(GlobalData_main.addressForShare) , str(cls.fil.getPort())))
                 GlobalData_main.objClogger.log("file share server started at {}".format(str(cls.path)) , "i")
                 GlobalData_main.isFileShareStarted = True
                 return GlobalData_main.dataListFileShare
             
+            # if we need to log to screen
             else:
                 customClearScreen()
 
+                # then start file share and print details
                 for i in cls.fil.start_fileShare(cls.path , http=http , port=GlobalData_main.portForFileShare , useOtherPort=True , userNameFTP=userName , userPasswordFTP=userPass , FTPanomusAccess=anomus , logToConsole=True):
                     if(i != None):
                         print(i)
                         print()
+
+                # when the key board interupt will happend it will go to retrun [] at last
 
                                
 
@@ -1406,6 +1448,7 @@ def driver(command):
 
         path = None
 
+        # if -d is passed
         if(GlobalMethods.isSubStringsList(command , "-d")):
             path = GlobalData_main.settingDict.get("defaultFolderFileShare" , "None")
             if(str(path).lower() == "none"):
@@ -1422,15 +1465,19 @@ def driver(command):
         logToConsole = False
         anomus = False
 
+        # if http is passed in command
         if(GlobalMethods.isSubStringsList(command , "http")):
             http = True
         
+        # if -log is passed in command
         if(GlobalMethods.isSubStringsList(command , "-log")):
             logToConsole = True
         
+        # if -a is passed in command
         if(GlobalMethods.isSubStringsList(command , "-a")):
             anomus = True
 
+        # call the function and pass parameters
         result = FileShareClass.startFileShare(http=http , logToConsole=logToConsole , anomus=anomus)
 
         if(result == None):
@@ -1570,8 +1617,12 @@ def main():
     while(True):
         customClearScreen()
 
+
+        # getting the user name from the settings file
         userName = GlobalData_main.settingDict.get("userName" , "None")
 
+
+        # if username in the settings file is None then username of operating system will be used
         if(userName == "None"):
             userName = getpass.getuser()
             GlobalData_main.userCP = "settings = None , PC = " + str(userName)
@@ -1579,10 +1630,12 @@ def main():
             GlobalData_main.userCP = "settings = {} , PC = {}".format(userName , getpass.getuser())
 
 
+        # if new version of jarvis is available then prompt
         if(GlobalData_main.toUpgradeJarvis):
             print("New version of jarvis is available, run update jarvis command to download the new version")
             print()
 
+        # if some child process of jarvis is running prompt
         for i in GlobalData_main.printDataList:
             print(i)
             print()
@@ -1598,11 +1651,17 @@ def main():
 
         # priting the result from driver function
         for i in driver(command):
+
+            # global take input
             if(i == "#take input#"):
                 inputted = input(GlobalData_main.tempInputToShow)
                 GlobalData_main.tempInput = inputted
+
+            # if function wants to clear screen
             elif(i == "clear screen"):
                 customClearScreen()
+
+            # else print output
             else:
                 print(i)
 
@@ -1691,7 +1750,7 @@ if __name__ == "__main__":
     # if the script is runned
     elif(GlobalData_main.troubleshootValue):
         print("\nIn Dev Mode \n")
-        time.sleep(0.5)
+        time.sleep(0.2)
 
 
     # creating a driver function reference to be used by troubleshoot class
@@ -1701,7 +1760,7 @@ if __name__ == "__main__":
     # A message will be printed if the troubleshoot value is True by default
     if(GlobalData_main.troubleshootValue):
         print("\nIn UEP Mode \n")
-        time.sleep(0.5)
+        time.sleep(0.2)
 
     # main will be called
     main()

@@ -225,13 +225,44 @@ A window will be prompted to select the location to share
 
 </br>
 </br>
+Options for start file share command - 
 
+1. http
 ```
 start file share http
 ```
 To start a http server
+usefull when you cannot access the ftp server
+Remember you can only download files using http server
+</br>
+
+2. -d
+```
+start file share -d
+```
+To start a server at default folder grabed from the settings file
 If you cannot access the ftp server
 Remember you can only download files using http server
+
+3. -log
+```
+start file share -log
+```
+when you want to see realtime status of server
+</br>
+
+4. -a
+```
+start file share -a
+```
+when you want to allow anonymous access to FTP server , that is without ID password
+</br>
+
+5. command can be clubbed together
+```
+start file share http -d -log
+```
+
 </br>
 </br>
 

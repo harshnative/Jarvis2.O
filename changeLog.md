@@ -29,6 +29,18 @@
 
 15. user can now add multi line input in password module
 
+16. user can set a default directory for file share
+
+17. file share now supports displaying log messages to console
+
+
+
+</br>
+</br>
+</br>
+</br>
+</br>
+
 
 # v0.1
 
