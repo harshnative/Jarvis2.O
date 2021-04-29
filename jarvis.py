@@ -104,6 +104,10 @@ class GlobalData_main:
                 'exit': {}, 
                 'all': {},
                 '-b': {},
+                'add': {},
+                'me': {},
+                'to': {},
+                'root': {},
                 }
 
 
@@ -337,6 +341,7 @@ from prompt_toolkit.lexers import PygmentsLexer
 
 
 # for adv search 
+""" bundling it in my packages to resolve the pyinstaller error"""
 from packages.fast_autocomplete import AutoComplete
 
 
@@ -1139,6 +1144,24 @@ class TroubleShooter:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # main driver function for executing commands
 def driver(command):
 
@@ -1522,6 +1545,40 @@ def driver(command):
     if(GlobalMethods.isSubStringsList(command , "upload log file")):
         for i in TroubleShooter.uploadFileAgain():
             yield i
+        return True
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # if the add me to root command is passed
+    if(GlobalMethods.isSubStringsList(command , "add me to root")):
+        
+        if(GlobalData_main.isOnWindows):
+            yield "This feature is only for linux users"
+
+        elif(GlobalData_main.isOnLinux):
+            yield "add this line to end in file opened - "
+            yield "\nusername ALL = (root) NOPASSWD: /bin/jarvis"
+            yield "\njust replace username with your your name , you can find your username by running whoami command\n"
+
+            os.system("sudo gedit /etc/sudoers")
+
+            yield "clear screen"
+
         return True
 
         

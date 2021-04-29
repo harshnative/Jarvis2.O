@@ -313,10 +313,10 @@ class FileShareClass:
 # for testing purpose
 if __name__ == "__main__":
     pass
-    fil = FileShareClass()
-    for i in (fil.start_fileShare("/home/harshnative" , http = True , logToConsole=True , port=5001 , useOtherPort=True)):
-        print(i)
+    # fil = FileShareClass()
+    # for i in (fil.start_fileShare("/home/harshnative" , http = True , logToConsole=True , port=5001 , useOtherPort=True)):
+    #     print(i)
 
-    import time
-    # time.sleep(60)
-    fil.stopFileShare()
+    # import time
+    # # time.sleep(60)
+    # fil.stopFileShare()
