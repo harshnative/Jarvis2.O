@@ -5,11 +5,15 @@ New and better console based personal assistant
 </br>
 </br>
 </br>
+</br>
 
 
 # Website
 https://www.letscodeofficial.com/jarvis
 
+
+</br>
+</br>
 </br>
 </br>
 </br>
@@ -18,6 +22,9 @@ https://www.letscodeofficial.com/jarvis
 visit https://www.letscodeofficial.com/jarvis_downloads
 
 
+
+</br>
+</br>
 </br>
 </br>
 </br>
@@ -31,9 +38,72 @@ update jarvis
 
 OR just downloading and installing the latest version
 
+
 </br>
 </br>
 </br>
+</br>
+</br>
+
+
+# Installing
+</br>
+
+## 1. Windows
+
+visit - https://www.letscodeofficial.com/jarvis_downloadWindows2
+</br>
+</br>
+
+## 2. Linux (Ubuntu/Debian)
+
+visit - https://www.letscodeofficial.com/jarvis_downloadLinux2
+</br>
+</br>
+
+You can run sudo jarvis command without password also
+</br>
+
+just run this command in jarvis and follow instructions
+```
+add me to root
+```
+</br>
+or run this command in terminal -
+
+```shell
+sudo gedit /etc/sudoers
+```
+
+then add this line to end of file
+```
+username ALL = (root) NOPASSWD: /bin/jarvis
+```
+
+remember to replace the username with your user name , you can find your username by running this command in terminal - 
+
+```shell
+whoami
+```
+
+</br>
+</br>
+</br>
+</br>
+</br>
+
+
+# Online Documentation
+
+visit - https://www.letscodeofficial.com/jarvis_docs_home
+
+
+</br>
+</br>
+</br>
+</br>
+</br>
+
 
 # Improvement to previous Gen Jarvis
 link to previous gen jarvis - https://github.com/harshnative/JARVIS
@@ -51,6 +121,8 @@ from development point of view -
 5. many more features
 
 
+
+</br>
 </br>
 </br>
 </br>
@@ -73,6 +145,8 @@ Jarvis 2.O can do many things such as
 More comming soon (^_^)
 
 
+
+</br>
 </br>
 </br>
 </br>
@@ -84,11 +158,12 @@ Jarvis is currently desinged , tested and maintained for linux and windows only.
 
 But project itself is made in python as has many other supported platform, making some changes the code should be able to make jarvis run on any operating system.
 
-</br>
-</br>
-</br>
-</br>
 
+</br>
+</br>
+</br>
+</br>
+</br>
 
 # Documentation
 <a href="#Weather">1. Weather</a>
@@ -105,6 +180,8 @@ But project itself is made in python as has many other supported platform, makin
 </br>
 
 
+
+</br>
 </br>
 </br>
 </br>
@@ -127,11 +204,12 @@ If no city name is passed then Jarvis check for the city name in city file
 
 you can set the default city name in settings file.
 
-</br>
-</br>
-</br>
-</br>
 
+</br>
+</br>
+</br>
+</br>
+</br>
 
 <h2 id="Speed-Test">
 2. Speed Test
@@ -170,6 +248,8 @@ speed test -b 3
 You can combine the commands
 
 
+
+</br>
 </br>
 </br>
 </br>
@@ -206,6 +286,8 @@ To restore the settings file to default value
 </br>
 Default settings file looks like - https://github.com/harshnative/Jarvis2.O/blob/main/defaultSettings.txt
 
+
+</br>
 </br>
 </br>
 </br>
@@ -281,6 +363,8 @@ set file share port PORTNUMBER
 To set custom file share port if the default file share port is busy in your machine which is 5000
 
 were PORTNUMBER can be from 1000 to 9999
+
+when the port number assigned is busy , jarvis automatically chooses a free port
 </br>
 </br>
 
@@ -289,6 +373,8 @@ were PORTNUMBER can be from 1000 to 9999
 show file share
 ```
 Show the output created by file share again to see the exact intructions to connect
+
+</br>
 </br>
 </br>
 </br>
@@ -388,12 +474,12 @@ like
 -sa all
 -u all 
 -d all
-</br>
 
 </br>
 </br>
 </br>
-
+</br>
+</br>
 
 <h2 id="Auto-Completion">
 6. Auto-Completion
@@ -407,7 +493,7 @@ Auto completion does not work when entering variables.
 
 
 </br>
-
+</br>
 </br>
 </br>
 </br>
@@ -421,8 +507,9 @@ Auto completion does not work when entering variables.
 2. Encryption used in password Data base - Jarvis uses military class encryption technique provided by easySED module to securely store your passwords. you learn more about easySED at https://www.letscodeofficial.com/pySEDDocs
 
 
-</br>
 
+</br>
+</br>
 </br>
 </br>
 </br>
@@ -430,6 +517,7 @@ Auto completion does not work when entering variables.
 
 # Contributors
 <a href="https://www.letscodeofficial.com/"><img src="https://www.letscodeofficial.com/static/images/favicon.ico" width="150" height="150" /><h3>Lets Code Official</h3></a>
+
 
 </br>
 </br>
@@ -441,8 +529,9 @@ Auto completion does not work when entering variables.
 More contributors are listed on website - https://www.letscodeofficial.com/jarvis_contributors
 
 
-</br>
 
+</br>
+</br>
 </br>
 </br>
 </br>
@@ -451,8 +540,9 @@ More contributors are listed on website - https://www.letscodeofficial.com/jarvi
 # Donate 🥰
 You can donate at https://www.letscodeofficial.com/jarvis_contribute
 
-</br>
 
+</br>
+</br>
 </br>
 </br>
 </br>
@@ -462,8 +552,9 @@ You can donate at https://www.letscodeofficial.com/jarvis_contribute
 Comming soon 
 
 
-</br>
 
+</br>
+</br>
 </br>
 </br>
 </br>
