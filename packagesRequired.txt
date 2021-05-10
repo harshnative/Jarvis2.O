@@ -1,4 +1,4 @@
-Listed in requirements.txt
+Listed in requirements.txt for linux + tkinter or reWin.txt for windows
 
 
 command to generate requirements.txt

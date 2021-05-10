@@ -101,7 +101,7 @@ class PasswordStorerClass:
         # if the custom path is passed the use it
         if(customDbPath != None):
             self.DataBasePath = customDbPath
-        
+
 
         else:
             # data base name
@@ -392,9 +392,16 @@ class PasswordStorerClass:
 
             # inserting into table
             valuesList = [data , password]
-            self.dbObj.insertIntoTable(valuesList=valuesList)
 
-            input("\nAdded successfully ...")
+            try:
+                self.dbObj.insertIntoTable(valuesList=valuesList)
+                input("\nAdded successfully ...")
+
+            except Exception:
+                self.customClearScreen()
+                print("insert operation failed , may be jarvis does not have permission to write")
+                print("try running jarvis as admin")
+                input("\n\npress enter to continue ...")
 
 
         # if -sa or see all command is passed

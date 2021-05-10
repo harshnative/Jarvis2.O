@@ -455,7 +455,7 @@ class GlobalMethods:
                 except IndexError:
                     newCommand = newCommand + i + " "
                     GlobalData_main.objClogger.log("adv search Index error in Globalmethods class correctCommad function with result = {} and searchString = {}".format(result , i) , "i")
-
+                    continue
 
 
                 # if result contains more than 1 string then simply add old command
@@ -1073,9 +1073,13 @@ class TroubleShooter:
 
             yield "clear screen"
 
-            # priting the result from driver function
-            for i in GlobalData_main.driverFuncReference(command):
-                yield i
+            try:
+                # priting the result from driver function
+                for i in GlobalData_main.driverFuncReference(command):
+                    yield i
+            except Exception as e:
+                GlobalData_main.objClogger.exception(str(e) , "Exception noted while running troubleshooter command")
+
 
             resetTempInput()
             GlobalData_main.tempInputToShow = "\n\nPress enter to upload log : "
