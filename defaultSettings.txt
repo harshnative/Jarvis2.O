@@ -1,10 +1,23 @@
-# username - comes instead of sir in greeting line - welcome { username }
-username : sir
+# for username to show while greeting above enter command line
+userName: None
 
+# default city for weather
+cityName: None
 
-# deafult city name for weather data
-cityName : None
+# custom path to password module , should include data base name as well
+path_for_password_db: None
 
+# Opt in or out of user experience program
+accept_user_experience_program: None
 
-# path for password database
-pathForPassDB : None 
+# username for accessing the ftp server
+userName_fileShare: None 
+
+# password for accessing for the ftp server
+password_fileShare: None 
+
+# default folder to share
+defaultFolderFileShare: None
+
+# default username to add ownership to file share
+defaultUserName: None

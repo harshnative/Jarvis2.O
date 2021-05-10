@@ -61,7 +61,7 @@ visit - https://www.letscodeofficial.com/jarvis_downloadLinux2
 </br>
 </br>
 
-You can run sudo jarvis command without password also
+You can run sudo jarvis command without entering password every time
 </br>
 
 just run this command in jarvis and follow instructions
@@ -178,6 +178,9 @@ But project itself is made in python as has many other supported platform, makin
 </br>
 <a href="#Auto-Completion">6. Auto Completion</a>
 </br>
+<a href="#troubleshoot">7. TroubleShoot</a>
+</br>
+
 
 
 
@@ -314,7 +317,7 @@ Options for start file share command -
 start file share http
 ```
 To start a http server
-usefull when you cannot access the ftp server
+usefull when you cannot access the ftp server as HTTP only require browser to work
 Remember you can only download files using http server
 </br>
 
@@ -323,8 +326,7 @@ Remember you can only download files using http server
 start file share -d
 ```
 To start a server at default folder grabed from the settings file
-If you cannot access the ftp server
-Remember you can only download files using http server
+
 
 3. -log
 ```
@@ -337,13 +339,15 @@ when you want to see realtime status of server
 ```
 start file share -a
 ```
-when you want to allow anonymous access to FTP server , that is without ID password
+when you want to allow anonymous access to FTP server , that is without ID password , but anonymous access is read only
 </br>
 
 5. command can be clubbed together
 ```
 start file share http -d -log
 ```
+
+now jarvis will start a http server with default dir from settings file in logging mode.
 
 </br>
 </br>
@@ -373,6 +377,23 @@ when the port number assigned is busy , jarvis automatically chooses a free port
 show file share
 ```
 Show the output created by file share again to see the exact intructions to connect
+
+</br>
+</br>
+
+#### username = user , password = 147896 - default user name and password , you can change these in settings file
+
+#### Note - on linux you may not be able to access files shared via file share module due to permission issue you need to run this command to fix that 
+
+```
+add file to me
+```
+
+it will ask for username which you find by running whoami command in terminal
+
+to avoid entering your user again and again you can use -d option to use username from settings file
+
+This command basically running chown command on linux
 
 </br>
 </br>
@@ -489,15 +510,39 @@ After writing some part of the command you can press tab to auto complete it
 
 Auto completion does not work when entering variables.
 
+You commands are automatically corrected when mispelled 
 
 
 
+
 </br>
 </br>
 </br>
 </br>
 </br>
 
+
+<h2 id="troubleshoot">
+7. Troubleshoot
+</h2>
+
+```
+troubleshoot
+```
+
+run this command to start the trouble shooter and follow the instructions
+
+Troubleshooter can the end will upload the log file to server for developers to investigate , it does not contain any sensitive information and password module does not have looger.
+
+If you participated in User experience programming then you dont need to re run the command , log file will directly be uploaded
+
+you can always opt in or out of UEP in settings file
+
+</br>
+</br>
+</br>
+</br>
+</br>
 
 
 # Some backend details

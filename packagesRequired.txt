@@ -1,4 +1,4 @@
-Listed in requirements.txt + tkinter
+Listed in requirements.txt
 
 
 command to generate requirements.txt

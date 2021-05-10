@@ -68,6 +68,7 @@ class SettingsClass:
   "userName_fileShare": "None" , 
   "password_fileShare": "None" , 
   "defaultFolderFileShare": "None", 
+  "defaultUserName": "None", 
 }
        
         # writing the file

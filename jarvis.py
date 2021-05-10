@@ -108,6 +108,10 @@ class GlobalData_main:
                 'me': {},
                 'to': {},
                 'root': {},
+                'add': {},
+                'file': {},
+                'to': {},
+                'me': {},
                 }
 
 
@@ -1512,6 +1516,49 @@ def driver(command):
             yield "\n"
 
         return True
+
+
+
+    # if add file to me command is passed
+    if(GlobalMethods.isSubStringsList(command , "add file me")):
+
+        # only for linux users
+        if(GlobalData_main.isOnWindows):
+            yield "This feature is only for linux users"
+
+        elif(GlobalData_main.isOnLinux):
+        
+            # getting the user name to which ownership be added
+            userName = "None"
+
+            if(GlobalMethods.isSubStringsList(command , "-d")):
+                userName = GlobalData_main.settingDict.get("defaultUserName" , "None")
+
+            if(userName == "None"):
+                # accepting the user aggrement to data share
+                resetTempInput()
+                GlobalData_main.tempInputToShow = "\n\nEnter the userName to add ownership of file share , you can see your user name by running whoami command , you can also add your user name to settings file and run with -d option : "
+                yield "#take input#"
+                userName = GlobalData_main.tempInput
+                resetTempInput()
+            
+            # if no path is present in file share memory prompt 
+            if(FileShareClass.path == None):
+                yield "clear screen"
+                yield "file share module could not find the path to dir"
+                yield "you can run this command instead the dir were you started file share manaully - "
+                yield "sudo chown -R {} *".format(userName)
+
+                return True
+
+            # add ownership
+            os.system("sudo chown -R {} {}/*".format(userName , FileShareClass.path))
+
+            
+        return True
+
+        
+
 
     # if show file share command is passed
     if(GlobalMethods.isSubStringsList(command , "show file")):
