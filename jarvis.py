@@ -337,6 +337,7 @@ import requests
 import webbrowser
 import hjson
 import datetime
+import traceback
 
 # for auto completion
 from prompt_toolkit import PromptSession
@@ -488,7 +489,7 @@ class GlobalMethods:
 
         # if some error occur simply return the old command
         except Exception as e:
-            GlobalData_main.objClogger.exception(str(e) , "Exception in Globalmethods class correctCommad function with command = {}".format(command))
+            GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Exception in Globalmethods class correctCommad function with command = {}".format(command))
             return command
 
 
@@ -518,7 +519,7 @@ class GlobalMethods:
         except Exception as e:
 
             # logging the error
-            GlobalData_main.objClogger.exception(str(e) , "Error in GlobalMethod class isSubString function , values(string , subString) = ({} , {})".format(string , subString))
+            GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Error in GlobalMethod class isSubString function , values(string , subString) = ({} , {})".format(string , subString))
             return False
 
 
@@ -671,7 +672,7 @@ class WeatherFunctionality:
         except Exception as e:
 
             # logging the error
-            GlobalData_main.objClogger.exception(str(e) , "Exception in getting the weather details in WeatherFunctionality class and returnDataDict function , values(cityName) = ({})".format(cityName))
+            GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Exception in getting the weather details in WeatherFunctionality class and returnDataDict function , values(cityName) = ({})".format(cityName))
             
             return "error , could not get the weather details :("
 
@@ -728,7 +729,7 @@ class Settings:
             return returnedDict
 
         except Exception as e:
-            GlobalData_main.objClogger.exception(str(e) , "error in settingObj.getDict() function")
+            GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "error in settingObj.getDict() function")
             return {}
 
     # method to open the settings file
@@ -742,7 +743,7 @@ class Settings:
             GlobalData_main.objClogger.log("settings file opened successfully" , "i")
             return True
         else:
-            GlobalData_main.objClogger.exception(str(result) , "Exception in opening the settings file")
+            GlobalData_main.objClogger.exception(str(result) , str(traceback.format_exc()) , "Exception in opening the settings file")
             return False
 
     
@@ -754,7 +755,7 @@ class Settings:
             GlobalData_main.objClogger.log("settings file restored succesfully successfully" , "i")
             return True
         except Exception as e:
-            GlobalData_main.objClogger.exception(str(e) , "error in restoring the settings file")
+            GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "error in restoring the settings file")
             return False
 
 
@@ -830,7 +831,7 @@ class FileShareClass:
 
             GlobalData_main.objClogger.log("file share path setted successfully" , "i")
         except Exception as e:
-            GlobalData_main.objClogger.exception(str(e) , "Exception in getting folder path from tkinter window")
+            GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Exception in getting folder path from tkinter window")
             return False
 
         cls.path = folder_selected
@@ -888,7 +889,7 @@ class FileShareClass:
                                
 
         except Exception as e:
-            GlobalData_main.objClogger.exception(str(e) , "Exception in starting the file share server at {}".format(str(cls.path)))
+            GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Exception in starting the file share server at {}".format(str(cls.path)))
             return None
         
         return ["file sharing stopped"] 
@@ -912,7 +913,7 @@ class FileShareClass:
             
             return True
         except Exception as e:
-            GlobalData_main.objClogger.exception(str(e) , "Exception in stopping the file share server at {}".format(str(cls.path)))
+            GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Exception in stopping the file share server at {}".format(str(cls.path)))
             return False
 
 
@@ -969,7 +970,7 @@ class VersionChecker(Thread):
             return versionFromResponse
 
         except Exception as e:
-                GlobalData_main.objClogger.exception(str(e) , "Exception in get version thread")
+                GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Exception in get version thread")
 
     
     
@@ -1010,7 +1011,7 @@ class TroubleShooter:
             logFile = open(logFilePath , 'rb')
             GlobalData_main.objClogger.log("Log file get procedure done successfully in TroubleShooter upload file function" , "i")
         except Exception as e:
-            GlobalData_main.objClogger.exception(str(e) , "Could not get the log file")
+            GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Could not get the log file")
             return 0
         
         # uploading the file to the server api using request method
@@ -1020,7 +1021,7 @@ class TroubleShooter:
         except ConnectionError:
             return 1
         except Exception as e:
-            GlobalData_main.objClogger.exception(str(e) , "Error in uploading the log file")
+            GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Error in uploading the log file")
             return 2
 
         # checking the response from the api 
@@ -1078,7 +1079,7 @@ class TroubleShooter:
                 for i in GlobalData_main.driverFuncReference(command):
                     yield i
             except Exception as e:
-                GlobalData_main.objClogger.exception(str(e) , "Exception noted while running troubleshooter command")
+                GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Exception noted while running troubleshooter command")
 
 
             resetTempInput()
@@ -1187,7 +1188,7 @@ def driver(command):
             return True
 
         except Exception as e:
-            GlobalData_main.objClogger.exception(str(e) , "Exception in starting the webbrowser to update jarvis")
+            GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Exception in starting the webbrowser to update jarvis")
             yield "could not open the download page in web browser"
             yield "you can visit https://www.letscodeofficial.com/jarvis_downloads to download manually"
             return True
@@ -1242,7 +1243,7 @@ def driver(command):
                 tempList.append(j)
                 resultList.append(tempList)
         except Exception as e:
-            GlobalData_main.objClogger.exception(str(e) , "Exception in getting the weather details of city = {}".format(str(cityName)))
+            GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Exception in getting the weather details of city = {}".format(str(cityName)))
             yield "could not get the wheather details of city : {} , sorry :(".format(cityName)
             return True
 
@@ -1669,7 +1670,7 @@ def driver(command):
             try:
                 FileShareClass.stopFileShare()
             except Exception as e:
-                GlobalData_main.objClogger.exception(str(e) , "Exception in closing the file share server at {} while exit all".format(str(FileShareClass.path)))
+                GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Exception in closing the file share server at {} while exit all".format(str(FileShareClass.path)))
 
         sys.exit()
 
@@ -1805,7 +1806,7 @@ if __name__ == "__main__":
     
     # if the cache fails then the settings file retored may not have been written due to not availabilty of cpu
     except Exception as e:
-        GlobalData_main.objClogger.exception(str(e) , "Exception in getting the dict from the settings file , may be the cpu was busy , trying again in 1 sec")
+        GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Exception in getting the dict from the settings file , may be the cpu was busy , trying again in 1 sec")
         time.sleep(1)
 
         # after one second jarvis will try again
@@ -1814,7 +1815,7 @@ if __name__ == "__main__":
 
             # if jarvis fails this time also then the computer must have been in deadlock state or jarvis does not have read write permission to program's data folder
         except Exception as e:
-            GlobalData_main.objClogger.exception(str(e) , "Exception in getting the dict from the settings file , may be the cpu was busy , or jarvis does not have read write permission")
+            GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Exception in getting the dict from the settings file , may be the cpu was busy , or jarvis does not have read write permission")
             customClearScreen()
             print("Could not load the settings file , cpu does not responded or jarvis does not have read write permission , Try again in some time :(")
             print("\n\nPress enter to continue")

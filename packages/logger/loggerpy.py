@@ -80,8 +80,8 @@ methods included - setTroubleShoot()    ->    used to set the the log level -
         else:
             logging.error("log parameter incorrectly passed")
 
-    def exception(self , exceptionPass , PlaceOfException):
-        stringPass = "In : " + PlaceOfException + " Exception Occured - " + exceptionPass
+    def exception(self , exceptionPass , tracebackInfo , PlaceOfException):
+        stringPass = "In : " + PlaceOfException + " Exception Occured - " + exceptionPass + "\n\n - # tracebackInfo = \n" + tracebackInfo + "\n\n"
         logging.error(str(stringPass))
 
     def returnLogFilePath(self):
