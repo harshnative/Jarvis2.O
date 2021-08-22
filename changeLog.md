@@ -5,6 +5,9 @@
 
 3. start file share -n verbose mode also option in settings for file share
 
+4. stores previously executed commands even after machine shutdown
+
+5. show suggestions for the command to run
 
 </br>
 </br>

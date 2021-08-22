@@ -41,6 +41,10 @@ class GlobalData_main:
     folderPathWindows_simpleSlash = r"C:/programData/JarvisData"
 
 
+    # prompt session
+    commandHistoryPath = None
+
+
     # obj for logger module
     objClogger = None
     troubleshootValue = False
@@ -348,6 +352,8 @@ import traceback
 from prompt_toolkit import PromptSession
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.lexers import PygmentsLexer
+from prompt_toolkit.history import FileHistory
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 
 
 # for adv search 
@@ -612,6 +618,12 @@ if __name__ == "__main__":
     GlobalData_main.autoCompleteReference = WordCompleter(tempList, ignore_case=True)
 
 
+
+    # setting up the command history path
+    if(GlobalData_main.isOnWindows):
+        GlobalData_main.commandHistoryPath = GlobalData_main.folderPathWindows_simpleSlash + "/" + "jarvisCommandHistory"
+    elif(GlobalData_main.isOnLinux):    
+        GlobalData_main.commandHistoryPath = GlobalData_main.folderPathLinux + "/" + "jarvisCommandHistory"
 
 
 
@@ -1802,7 +1814,7 @@ def driver(command):
 def main():
 
 
-    session = PromptSession(completer=GlobalData_main.autoCompleteReference)
+    session = PromptSession(completer=GlobalData_main.autoCompleteReference , history=FileHistory(GlobalData_main.commandHistoryPath) , auto_suggest=AutoSuggestFromHistory())
 
 
     # running until exit is called in driver
