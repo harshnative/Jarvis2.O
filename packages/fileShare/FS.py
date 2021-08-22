@@ -69,20 +69,26 @@ class FileShareClass:
         except socket.error as e:
             if(e.errno == errno.EADDRINUSE):
 
-                # if using other port is allowed
-                if(useOtherPort):
+                try:
+                    # you don't care just listen to that port
+                    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                    s.bind((self.ipAddress, self.port))
+                except Exception as e:
 
-                    # finding free port by assign port = 0 then system will auto bind the port
-                    with closing(s) as s:
-                        s.bind(('', 0))
-                        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                    # if using other port is allowed
+                    if(useOtherPort):
+
+                        # finding free port by assign port = 0 then system will auto bind the port
+                        with closing(s) as s:
+                            s.bind(('', 0))
+                            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                            
+                            # assign the port to object
+                            self.port = s.getsockname()[1]
                         
-                        # assign the port to object
-                        self.port = s.getsockname()[1]
-                    
-                # else raise error
-                else:
-                    raise RuntimeError("Port {} is already in use".format(self.port))
+                    # else raise error
+                    else:
+                        raise RuntimeError("Port {} is already in use".format(self.port))
             
             else:
                 pass
