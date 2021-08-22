@@ -1,3 +1,17 @@
+# v0.3
+1. -nolog option for fileshare
+
+2. auto file add option in settings for file share
+
+3. start file share -n verbose mode also option in settings for file share
+
+
+</br>
+</br>
+</br>
+</br>
+</br>
+
 # v0.2
 1. fixed jarvis data folder system in linux
 

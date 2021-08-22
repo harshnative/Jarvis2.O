@@ -74,6 +74,10 @@ class GlobalData_main:
     # driver function reference
     driverFuncReference = None
 
+    # file share
+    runFileThread = True
+    autoAddFileThreadObj = None
+
     # auto complete reference list
     autoCompleteReference = None
 
@@ -112,6 +116,7 @@ class GlobalData_main:
                 'file': {},
                 'to': {},
                 'me': {},
+                '-nolog': {},
                 }
 
 
@@ -891,7 +896,16 @@ class FileShareClass:
         except Exception as e:
             GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Exception in starting the file share server at {}".format(str(cls.path)))
             return None
-        
+
+        # stop the auto add file share thread if exist
+        GlobalData_main.runFileThread = False
+
+        if(GlobalData_main.autoAddFileThreadObj != None):
+            try:
+                GlobalData_main.autoAddFileThreadObj.join()
+            except Exception as e:
+                GlobalData_main.objClogger.exception(str(e) , str(traceback.format_exc()) , "Exception in stoping auto add file share thread in -log mode")
+
         return ["file sharing stopped"] 
 
     
@@ -919,6 +933,62 @@ class FileShareClass:
 
 
 
+
+# auto file add thread class for file share
+class AutoFileAdd_fileShare(Thread):
+
+    def run(self):
+
+        GlobalData_main.objClogger.log("starting auto add file thread" , "i")
+
+
+        # getting time to run from settings
+        timeToRun = str(GlobalData_main.settingDict.get("timeDelayInAutoAddFile" , "none")).lower()
+
+        if(timeToRun == "none"):
+            timeToRun = 10
+        else:
+            timeToRun = float(timeToRun)
+
+        tempTimeToRun = 1
+        if(timeToRun < 1):
+            tempTimeToRun = timeToRun
+
+        timeCount = 0
+
+
+        # only for linux users
+        if(GlobalData_main.isOnWindows):
+            return
+
+        if(GlobalData_main.isOnLinux):
+
+            # getting the user name to which ownership be added
+            userName = GlobalData_main.settingDict.get("defaultUserName" , "None")
+
+            # stop thread if the username is not present in the settings file
+            if(userName == "None"):
+                return
+            
+            # if no path is present in file share memory stop thread 
+            if(FileShareClass.path == None):
+                return
+
+            while(GlobalData_main.runFileThread):
+
+                # loop will check every 1 sec or less for exit condition no matter what is time to run
+                if(timeCount >= timeToRun):
+                    # add ownership
+                    os.system("sudo chown -R {} {}/* >/dev/null 2>&1".format(userName , FileShareClass.path))
+
+                    GlobalData_main.objClogger.log("runned add file to me command succesfully with delay = {} and command format = '{}'".format(timeToRun , "sudo chown -R {} {}/* >/dev/null 2>&1".format(userName , FileShareClass.path)) , "i")
+
+                    timeCount = 0
+
+                time.sleep(tempTimeToRun)
+                timeCount = timeCount + tempTimeToRun
+            
+        GlobalData_main.objClogger.log("auto add file thread stopped" , "i")
 
 
 
@@ -1458,6 +1528,8 @@ def driver(command):
     # if stop file share command is passed
     if(GlobalMethods.isSubStringsList(command , "stop file")):
 
+        GlobalData_main.runFileThread = False
+
         if(GlobalData_main.isFileShareStarted):
             status = FileShareClass.stopFileShare()
 
@@ -1499,14 +1571,26 @@ def driver(command):
         # if http is passed in command
         if(GlobalMethods.isSubStringsList(command , "http")):
             http = True
+
+        if(str(GlobalData_main.settingDict.get("fileShareIn_V_Mode" , "none")).lower() == "true"):
+            logToConsole = True
         
         # if -log is passed in command
         if(GlobalMethods.isSubStringsList(command , "-log")):
             logToConsole = True
+
+        # if -nolog is passed in command
+        if(GlobalMethods.isSubStringsList(command , "-nolog")):
+            logToConsole = False
         
         # if -a is passed in command
         if(GlobalMethods.isSubStringsList(command , "-a")):
             anomus = True
+
+        if((str(GlobalData_main.settingDict.get("autoAddFileToUser" , "none")).lower() == "true")):
+            GlobalData_main.autoAddFileThreadObj = AutoFileAdd_fileShare()
+            GlobalData_main.autoAddFileThreadObj.start()
+
 
         # call the function and pass parameters
         result = FileShareClass.startFileShare(http=http , logToConsole=logToConsole , anomus=anomus)

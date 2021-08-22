@@ -35,7 +35,10 @@ class SettingsClass:
   "userName_fileShare": "None" , 
   "password_fileShare": "None" , 
   "defaultFolderFileShare": "None", 
-  "defaultUserName": "None", 
+  "defaultUserName": "None",
+  "fileShareIn_V_Mode": "None" , 
+  "autoAddFileToUser": "None" , 
+  "timeDelayInAutoAddFile": "10" , 
 }
 
     
@@ -77,18 +80,17 @@ class SettingsClass:
             dictReturned = hjson.loads(data)
             return dictReturned
 
-
-
     # this method generate the file with default values
     def regenerateSettingsFile(self , settingsFile = None):
 
         if(settingsFile == None):
             settingsFile = self.settingsFile
 
-       
         # writing the file
         with open(self.path , "w+") as file:
             file.write(hjson.dumps(settingsFile))
+
+
 
         
     # function to open the settings using default opener
