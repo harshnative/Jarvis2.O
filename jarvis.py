@@ -5,6 +5,7 @@ import time
 import sys
 import subprocess as sp
 from threading import Thread
+from typing import NewType
 sys.path.append(os.path.join(os.path.dirname(__file__), '.'))
 from packages.logger import loggerpy 
 import multiprocessing
@@ -82,46 +83,11 @@ class GlobalData_main:
     runFileThread = True
     autoAddFileThreadObj = None
 
-    # auto complete reference list
-    autoCompleteReference = None
-
     # search reference dict
-    searchDict = {'weather': {}, 
-                'update': {}, 
-                'jarvis': {}, 
-                'speed': {}, 
-                'test': {}, 
-                'setting': {}, 
-                'restore': {}, 
-                'open': {}, 
-                'password': {}, 
-                'set': {}, 
-                'file': {}, 
-                'port': {}, 
-                'stop': {}, 
-                'start': {}, 
-                'share': {},
-                '-log': {},
-                '-a': {},
-                '-d': {},
-                'http': {},
-                'show': {}, 
-                'upload': {}, 
-                'log': {}, 
-                'troubleshoot': {}, 
-                'exit': {}, 
-                'all': {},
-                '-b': {},
-                'add': {},
-                'me': {},
-                'to': {},
-                'root': {},
-                'add': {},
-                'file': {},
-                'to': {},
-                'me': {},
-                '-nolog': {},
-                }
+    autoCompletionDict = {}
+
+    # fast auto complete dict
+    fastAutoCompleteDict = {}
 
 
 
@@ -354,7 +320,7 @@ from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.lexers import PygmentsLexer
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-
+from prompt_toolkit.completion import NestedCompleter
 
 # for adv search 
 """ bundling it in my packages to resolve the pyinstaller error"""
@@ -375,10 +341,45 @@ from packages.fileShare import FS
 from tkinter import filedialog
 from tkinter import *
 
+
+# function to get all the keys from a dict
+def recursive_items(dictionary):
+    for key, value in dictionary.items():
+        if type(value) is dict:
+            yield (key, value)
+            yield from recursive_items(value)
+        else:
+            yield (key, value)
+
 # init tkinter
 if __name__ == "__main__":
     GlobalData_main.root = Tk()
     GlobalData_main.root.withdraw()
+
+    autoCompleteDict = {'weather': {}, 
+                'update': {'jarvis': None , 'setting' : None}, 
+                'speed': {'test': {"-b" : None}}, 
+                'restore': {'setting' : None}, 
+                'open': {'setting' : None}, 
+                'password': {}, 
+                'set': {"file" : {"port" : None}}, 
+                'stop': {"file" : {"share" : None}}, 
+                'start': {"file" : {"share" : {'-log' : {'-a' : {} , '-d' : {} , 'http' : {}} , '-nolog' : {'-a' : {} , '-d' : {} , 'http' : {}} , '-a' : {'-nolog' : {} , '-log' : {} , '-d' : {} , 'http' : {}} , '-d' : {'-nolog' : {} , '-a' : {} , '-log' : {} , 'http' : {}} , 'http' : {'-nolog' : {} , '-a' : {} , '-d' : {} , '-log' : {}}}}}, 
+                'show': {"file" : None}, 
+                'upload': {"log" : {"file" : None}}, 
+                'troubleshoot': {}, 
+                'exit': {'all' : None}, 
+                'add': {"file" : {"to" : {"me" : None}} , "me" : {"to" : {"root" : None}}},
+                }
+
+    GlobalData_main.autoCompletionDict = NestedCompleter.from_nested_dict(autoCompleteDict)
+
+
+    newDict = {}
+    for key, value in recursive_items(autoCompleteDict):
+        newDict[key] = {}
+
+    GlobalData_main.fastAutoCompleteDict = newDict
 
 
 
@@ -413,7 +414,7 @@ if __name__ == "__main__":
 class GlobalMethods:
 
     # setting up the adv search obj
-    advSearchObj = AutoComplete(words=GlobalData_main.searchDict)
+    advSearchObj = AutoComplete(words=GlobalData_main.fastAutoCompleteDict)
 
 
 
@@ -609,14 +610,6 @@ if __name__ == "__main__":
     # setting up the api
     setApis()
 
-    tempList = []
-    # converting search dict keys to list
-    for i,j in GlobalData_main.searchDict.items():
-        tempList.append(i) 
-
-    # setting up values in auto completer
-    GlobalData_main.autoCompleteReference = WordCompleter(tempList, ignore_case=True)
-
 
 
     # setting up the command history path
@@ -624,6 +617,8 @@ if __name__ == "__main__":
         GlobalData_main.commandHistoryPath = GlobalData_main.folderPathWindows_simpleSlash + "/" + "jarvisCommandHistory"
     elif(GlobalData_main.isOnLinux):    
         GlobalData_main.commandHistoryPath = GlobalData_main.folderPathLinux + "/" + "jarvisCommandHistory"
+
+    
 
 
 
@@ -1814,7 +1809,7 @@ def driver(command):
 def main():
 
 
-    session = PromptSession(completer=GlobalData_main.autoCompleteReference , history=FileHistory(GlobalData_main.commandHistoryPath) , auto_suggest=AutoSuggestFromHistory())
+    session = PromptSession(completer=GlobalData_main.autoCompletionDict , history=FileHistory(GlobalData_main.commandHistoryPath) , auto_suggest=AutoSuggestFromHistory())
 
 
     # running until exit is called in driver

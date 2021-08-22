@@ -9,6 +9,8 @@
 
 5. show suggestions for the command to run
 
+6. improved auto completion
+
 </br>
 </br>
 </br>
